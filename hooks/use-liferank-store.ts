@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { activityCatalog } from "@/lib/constants";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -23,7 +23,30 @@ export function useLifeRankStore() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
-  async function loadUserGroupAndActivities(userId: string) {
+  const loadActivities = useCallback(async (groupId: string, userId: string) => {
+    const { data: acts } = await supabase
+      .from("activities")
+      .select("*, profiles(name)")
+      .eq("group_id", groupId)
+      .order("created_at", { ascending: false });
+
+    if (acts) {
+      setActivities(acts.map((a: any) => ({
+        id: a.id,
+        userId: a.profile_id,
+        userName: a.profiles?.name || "Usuário",
+        groupId: a.group_id,
+        type: a.type,
+        label: a.label,
+        date: a.date,
+        points: a.points,
+        hours: a.hours,
+        createdAt: a.created_at
+      })));
+    }
+  }, []);
+
+  const loadUserGroupAndActivities = useCallback(async (userId: string) => {
     const { data: membership } = await supabase
       .from("memberships")
       .select("group_id, groups(*)")
@@ -52,29 +75,9 @@ export function useLifeRankStore() {
       };
 
       setGroup(groupData);
-
-      const { data: acts } = await supabase
-        .from("activities")
-        .select("*, profiles(name)")
-        .eq("group_id", g.id)
-        .order("created_at", { ascending: false });
-
-      if (acts) {
-        setActivities(acts.map((a: any) => ({
-          id: a.id,
-          userId: a.profile_id,
-          userName: a.profiles?.name || "Usuário",
-          groupId: a.group_id,
-          type: a.type,
-          label: a.label,
-          date: a.date,
-          points: a.points,
-          hours: a.hours,
-          createdAt: a.created_at
-        })));
-      }
+      await loadActivities(g.id, userId);
     }
-  }
+  }, [loadActivities]);
 
   // 2. Inicialização
   useEffect(() => {
@@ -110,7 +113,8 @@ export function useLifeRankStore() {
       setHydrated(true);
     }
     init();
-  }, []);
+  }, [loadUserGroupAndActivities]);
+
   useEffect(() => {
     if (!profile || !group) return;
 
@@ -125,7 +129,7 @@ export function useLifeRankStore() {
           filter: `group_id=eq.${group.id}` 
         },
         () => {
-          loadUserGroupAndActivities(profile.id);
+          loadActivities(group.id, profile.id);
         }
       )
       .subscribe();
@@ -133,7 +137,7 @@ export function useLifeRankStore() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [profile?.id, group?.id]);
+  }, [profile?.id, group?.id, loadActivities]);
 
   const monthKey = getMonthKey(getTodayKey());
 
@@ -165,7 +169,7 @@ export function useLifeRankStore() {
 
   const achievements = useMemo(() => getAchievements(profile, activities), [activities, profile]);
 
-  async function createProfile(input: { name: string; phone: string; avatar: string }) {
+  const createProfile = useCallback(async (input: { name: string; phone: string; avatar: string }) => {
     const id = profile?.id ?? createId();
     const nextProfile: UserProfile = {
       id,
@@ -191,9 +195,9 @@ export function useLifeRankStore() {
       console.error("Erro Supabase (Profile):", error);
       toast.error("Erro ao salvar perfil.");
     }
-  }
+  }, [profile]);
 
-  async function createGroup(name: string) {
+  const createGroup = useCallback(async (name: string) => {
     if (!profile) return;
     const code = Math.random().toString(36).slice(2, 8).toUpperCase();
     const { data: newGroup } = await supabase
@@ -210,9 +214,9 @@ export function useLifeRankStore() {
       toast.success(`Grupo ${name} criado!`);
       await loadUserGroupAndActivities(profile.id);
     }
-  }
+  }, [profile, loadUserGroupAndActivities]);
 
-  async function joinGroup(code: string) {
+  const joinGroup = useCallback(async (code: string) => {
     if (!profile) return;
     const { data: g } = await supabase
       .from("groups")
@@ -234,9 +238,9 @@ export function useLifeRankStore() {
     } else {
       toast.error("Código inválido.");
     }
-  }
+  }, [profile, loadUserGroupAndActivities]);
 
-  async function addActivity(input: { type: ActivityType; label?: string; date: string; hours?: number }) {
+  const addActivity = useCallback(async (input: { type: ActivityType; label?: string; date: string; hours?: number }) => {
     if (!profile || !group) return;
     const typeConfig = activityCatalog[input.type];
     const points = getActivityPoints(input.type, input.hours);
@@ -256,13 +260,13 @@ export function useLifeRankStore() {
     } else {
       toast.error("Erro ao salvar atividade.");
     }
-  }
+  }, [profile, group]);
 
-  async function loginByName(name: string) {
-    const { data: dbProfile, error } = await supabase
+  const loginByName = useCallback(async (name: string) => {
+    const { data: dbProfile } = await supabase
       .from("profiles")
       .select("*")
-      .ilike("name", name) // Busca ignorando maiúsculas/minúsculas
+      .ilike("name", name)
       .single();
 
     if (dbProfile) {
@@ -282,16 +286,16 @@ export function useLifeRankStore() {
       toast.error("perfil não encontrado com este nome.");
       return false;
     }
-  }
+  }, [loadUserGroupAndActivities]);
 
-  function logout() {
+  const logout = useCallback(() => {
     setProfile(null);
     setGroup(null);
     setActivities([]);
     localStorage.removeItem("liferank.profile");
-  }
+  }, []);
 
-  return {
+  return useMemo(() => ({
     hydrated,
     profile,
     group,
@@ -306,5 +310,20 @@ export function useLifeRankStore() {
     addActivity,
     loginByName,
     logout
-  };
+  }), [
+    hydrated,
+    profile,
+    group,
+    activities,
+    ranking,
+    myStats,
+    levelInfo,
+    achievements,
+    createProfile,
+    createGroup,
+    joinGroup,
+    addActivity,
+    loginByName,
+    logout
+  ]);
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
@@ -43,12 +44,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="absolute -right-[10%] -bottom-[10%] h-[500px] w-[500px] rounded-full bg-accent-sun/5 blur-[120px]" />
       </div>
 
-      <header className="sticky top-0 z-40 w-full px-4 pt-4 md:px-6 md:pt-6">
+      <header className="sticky top-0 z-40 w-full px-3 pt-3 md:px-6 md:pt-6">
         <div className="mx-auto max-w-7xl">
-          <div className="rounded-[32px] border border-slate-100 bg-white/70 px-6 py-4 backdrop-blur-xl shadow-lg shadow-brand-500/5 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="h-10 w-10 rounded-2xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">
-                <Trophy className="h-6 w-6" />
+          <div className="rounded-[24px] md:rounded-[32px] border border-slate-100 bg-white/70 px-4 py-3 md:px-6 md:py-4 backdrop-blur-xl shadow-lg shadow-brand-500/5 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
+              <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">
+                <Trophy className="h-5 w-5 md:h-6 md:w-6" />
               </div>
               <div className="hidden sm:block">
                 <p className="text-sm font-bold tracking-tight text-accent-slate">LifeRank</p>
@@ -86,19 +87,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            <div className="flex items-center gap-4">
-              <Link href="/profile" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+            <div className="flex items-center gap-2 md:gap-4">
+              <Link href="/profile" className="flex items-center gap-2 md:gap-3 transition-opacity hover:opacity-80">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-bold text-accent-slate leading-none">{profile?.name ?? "Visitante"}</p>
                   <p className="text-[10px] font-bold text-brand-500 mt-1 uppercase tracking-widest leading-none">Nível {levelInfo.level}</p>
                 </div>
-                <div className="h-10 w-10 overflow-hidden rounded-2xl bg-slate-50 ring-2 ring-white shadow-sm">
+                <div className="h-9 w-9 md:h-10 md:w-10 overflow-hidden rounded-xl md:rounded-2xl bg-slate-50 ring-2 ring-white shadow-sm relative">
                   {profile?.avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profile.avatar} alt={profile.name} className="h-full w-full object-cover" />
+                    <Image 
+                      src={profile.avatar} 
+                      alt={profile.name} 
+                      fill 
+                      className="object-cover" 
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-300">
-                      <UserIcon className="h-5 w-5" />
+                      <UserIcon className="h-4 w-4 md:h-5 md:w-5" />
                     </div>
                   )}
                 </div>
@@ -106,10 +111,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
               <button
                 onClick={handleLogout}
-                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500 shadow-sm"
+                className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl md:rounded-2xl bg-slate-50 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500 shadow-sm"
                 title="Sair do sistema"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4 md:h-5 md:w-5" />
               </button>
             </div>
           </div>
@@ -131,8 +136,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </main>
 
-      <div className="md:hidden sticky bottom-6 z-40 w-full px-4">
-        <div className="mx-auto flex max-w-sm items-center justify-around rounded-[32px] border border-slate-100 bg-white/80 p-2 backdrop-blur-xl shadow-2xl shadow-brand-500/10">
+      <div className="md:hidden sticky bottom-6 z-40 w-full px-4 pointer-events-none">
+        <div className="mx-auto flex max-w-md items-center justify-around rounded-[28px] border border-slate-100 bg-white/90 p-1.5 backdrop-blur-xl shadow-2xl shadow-brand-500/10 pointer-events-auto">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.href] || PlusCircle;
             const isActive = pathname === item.href;
@@ -142,12 +147,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={clsx(
-                  "relative flex flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                  "relative flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 transition-all duration-300 min-w-[50px]",
                   isActive ? "text-brand-600" : "text-slate-400"
                 )}
               >
                 <Icon className={clsx("h-5 w-5", isActive ? "scale-110" : "opacity-70")} />
-                <span className="text-[10px] font-bold uppercase tracking-tighter">{item.label}</span>
+                <span className="text-[9px] font-bold uppercase tracking-tighter whitespace-nowrap">{item.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="mobile-nav-pill"
@@ -158,14 +163,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center gap-1 rounded-2xl px-4 py-3 text-slate-400 transition-all duration-300 hover:text-red-500"
-          >
-            <LogOut className="h-5 w-5 opacity-70" />
-            <span className="text-[10px] font-bold uppercase tracking-tighter">Sair</span>
-          </button>
         </div>
       </div>
     </div>

@@ -27,7 +27,6 @@ export function LandingPage() {
     if (!loginName.trim()) return;
     
     setIsLoggingIn(true);
-    // Simular um pequeno delay para feedback visual
     await new Promise(resolve => setTimeout(resolve, 800));
     const success = await loginByName(loginName.trim());
     setIsLoggingIn(false);

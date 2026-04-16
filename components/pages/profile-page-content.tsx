@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { User, Phone, Image as ImageIcon, Check, ArrowRight, Camera, Award, Sparkles } from "lucide-react";
@@ -144,7 +145,7 @@ export function ProfilePageContent() {
         <div className="relative isolate flex items-center justify-center">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(255,138,0,0.08),transparent_70%)]" />
           
-          <div className="w-full max-w-sm rounded-[42px] md:rounded-[56px] border border-slate-100 bg-white p-6 md:p-10 shadow-2xl shadow-brand-500/10">
+          <div className="w-full max-w-[340px] md:max-w-sm rounded-[36px] md:rounded-[56px] border border-slate-100 bg-white p-6 md:p-10 shadow-2xl shadow-brand-500/10">
             <div className="mb-6 md:mb-10 flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">LifeRank Identity</span>
               <AnimatePresence>
@@ -158,10 +159,14 @@ export function ProfilePageContent() {
  
             <div className="flex flex-col items-center">
               <div className="relative mb-6 md:mb-8">
-                <div className="h-32 w-32 md:h-40 md:w-40 overflow-hidden rounded-[36px] md:rounded-[48px] bg-slate-50 ring-6 md:ring-8 ring-brand-50 shadow-inner">
+                <div className="h-32 w-32 md:h-40 md:w-40 overflow-hidden rounded-[36px] md:rounded-[48px] bg-slate-50 ring-6 md:ring-8 ring-brand-50 shadow-inner relative">
                   {avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={avatar} alt="Preview" className="h-full w-full object-cover" />
+                    <Image 
+                      src={avatar} 
+                      alt="Preview" 
+                      fill 
+                      className="object-cover" 
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-200">
                       <User className="h-16 w-16 md:h-20 md:w-20" />
