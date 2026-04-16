@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { LifeRankProvider } from "@/components/providers/life-rank-provider";
 
 const outfit = Outfit({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${outfit.variable} font-sans`}>
+        <Toaster position="top-center" richColors />
         <LifeRankProvider>{children}</LifeRankProvider>
       </body>
     </html>

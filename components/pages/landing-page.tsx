@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useLifeRank } from "@/components/providers/life-rank-provider";
 import { 
   Trophy, 
   Zap, 
@@ -9,11 +11,24 @@ import {
   Calendar, 
   ChevronRight, 
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  User as UserIcon
 } from "lucide-react";
 
 export function LandingPage() {
   const router = useRouter();
+  const { loginByName } = useLifeRank();
+  const [loginName, setLoginName] = useState("");
+  const [showLogin, setShowLogin] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!loginName.trim()) return;
+    const success = await loginByName(loginName.trim());
+    if (success) {
+      router.push("/dashboard");
+    }
+  }
 
   const container = {
     hidden: { opacity: 0 },
@@ -41,13 +56,29 @@ export function LandingPage() {
               <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-500/20" />
               <span className="text-xl font-bold tracking-tight text-accent-slate">LifeRank</span>
             </div>
-            <button
-              onClick={() => router.push("/profile")}
-              className="flex items-center gap-2 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
-            >
-              Entrar
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            
+            {!showLogin ? (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="flex items-center gap-2 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
+              >
+                Entrar apenas com o nome
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <form onSubmit={handleLogin} className="flex items-center gap-2">
+                <input 
+                  autoFocus
+                  value={loginName}
+                  onChange={(e) => setLoginName(e.target.value)}
+                  placeholder="Seu nome..." 
+                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs outline-none focus:border-brand-500" 
+                />
+                <button type="submit" className="rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-600">
+                  Acessar
+                </button>
+              </form>
+            )}
           </div>
         </nav>
 
@@ -152,7 +183,7 @@ export function LandingPage() {
             <div className="h-6 w-6 rounded-lg bg-brand-500" />
             <span className="text-lg font-bold text-accent-slate">LifeRank</span>
           </div>
-          <p className="text-sm text-slate-400">© 2026 LifeRank Studio. Premium Productivity.</p>
+          <p className="text-sm text-slate-400">© 2026 Todos os direitos reservados</p>
           <div className="flex gap-6">
             <a href="#" className="text-sm font-medium text-slate-500 hover:text-brand-500">Termos</a>
             <a href="#" className="text-sm font-medium text-slate-500 hover:text-brand-500">Privacidade</a>

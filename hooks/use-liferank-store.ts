@@ -2,78 +2,142 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { activityCatalog } from "@/lib/constants";
-import { defaultStorage, readStorage, writeStorage } from "@/lib/storage";
-import { Activity, ActivityType, GroupData, StorageShape, UserProfile } from "@/lib/types";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { Activity, ActivityType, GroupData, UserProfile } from "@/lib/types";
 import {
   createId,
   getAchievements,
   getActivityPoints,
-  getDemoMembers,
   getMonthKey,
   getRanking,
   getStreak,
   getTodayKey
 } from "@/lib/utils";
 
-type CreateProfileInput = {
-  name: string;
-  phone: string;
-  avatar: string;
-};
-
-type AddActivityInput = {
-  type: ActivityType;
-  label?: string;
-  date: string;
-  hours?: number;
-};
-
-function createSeededActivities(groupId: string) {
-  return [
-    {
-      id: createId("activity"),
-      userId: "member_sofia",
-      userName: "Sofia",
-      groupId,
-      type: "study" as const,
-      label: activityCatalog.study.label,
-      date: getTodayKey(),
-      createdAt: new Date().toISOString(),
-      points: 20,
-      hours: 2
-    },
-    {
-      id: createId("activity"),
-      userId: "member_caio",
-      userName: "Caio",
-      groupId,
-      type: "gym" as const,
-      label: activityCatalog.gym.label,
-      date: getTodayKey(),
-      createdAt: new Date().toISOString(),
-      points: 10
-    }
-  ];
-}
+export const XP_PER_LEVEL = 200;
 
 export function useLifeRankStore() {
-  const [storage, setStorage] = useState<StorageShape>(defaultStorage);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [group, setGroup] = useState<GroupData | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
+  // 1. Carregar Dados do Grupo e Atividades
+  async function loadUserGroupAndActivities(userId: string) {
+    const { data: membership } = await supabase
+      .from("memberships")
+      .select("group_id, groups(*)")
+      .eq("profile_id", userId)
+      .single();
+
+    if (membership && membership.groups) {
+      const g = membership.groups as any;
+      
+      const { data: members } = await supabase
+        .from("memberships")
+        .select("profiles(id, name, avatar_url)")
+        .eq("group_id", g.id);
+
+      const groupData: GroupData = {
+        id: g.id,
+        name: g.name,
+        code: g.code,
+        createdAt: g.created_at,
+        members: (members || []).map((m: any) => ({
+          id: m.profiles.id,
+          name: m.profiles.name,
+          avatar: m.profiles.avatar_url,
+          isCurrentUser: m.profiles.id === userId
+        }))
+      };
+
+      setGroup(groupData);
+
+      const { data: acts } = await supabase
+        .from("activities")
+        .select("*, profiles(name)")
+        .eq("group_id", g.id)
+        .order("created_at", { ascending: false });
+
+      if (acts) {
+        setActivities(acts.map((a: any) => ({
+          id: a.id,
+          userId: a.profile_id,
+          userName: a.profiles?.name || "Usuário",
+          groupId: a.group_id,
+          type: a.type,
+          label: a.label,
+          date: a.date,
+          points: a.points,
+          hours: a.hours,
+          createdAt: a.created_at
+        })));
+      }
+    }
+  }
+
+  // 2. Inicialização
   useEffect(() => {
-    const nextStorage = readStorage();
-    setStorage(nextStorage);
-    setHydrated(true);
+    async function init() {
+      const localProfile = localStorage.getItem("liferank.profile");
+      if (localProfile) {
+        const p = JSON.parse(localProfile) as UserProfile;
+        
+        if (p.id.includes("user_")) {
+          localStorage.removeItem("liferank.profile");
+          setHydrated(true);
+          return;
+        }
+
+        const { data: dbProfile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", p.id)
+          .single();
+        
+        if (dbProfile) {
+          const mappedProfile: UserProfile = {
+            id: dbProfile.id,
+            name: dbProfile.name,
+            phone: dbProfile.phone,
+            avatar: dbProfile.avatar_url,
+            createdAt: dbProfile.created_at
+          };
+          setProfile(mappedProfile);
+          await loadUserGroupAndActivities(mappedProfile.id);
+        }
+      }
+      setHydrated(true);
+    }
+    init();
   }, []);
 
+  // 3. Realtime Listener
   useEffect(() => {
-    if (!hydrated) return;
-    writeStorage(storage);
-  }, [storage, hydrated]);
+    if (!profile || !group) return;
 
-  const profile = storage.profile;
-  const group = storage.group;
-  const activities = storage.activities;
+    const channel = supabase
+      .channel(`group-${group.id}`)
+      .on(
+        "postgres_changes" as any,
+        { 
+          event: "*", 
+          schema: "public", 
+          table: "activities", 
+          filter: `group_id=eq.${group.id}` 
+        },
+        () => {
+          loadUserGroupAndActivities(profile.id);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id, group?.id]);
+
   const monthKey = getMonthKey(getTodayKey());
 
   const ranking = useMemo(
@@ -82,134 +146,152 @@ export function useLifeRankStore() {
   );
 
   const myStats = useMemo(() => {
-    if (!profile) {
-      return {
-        totalPoints: 0,
-        monthlyPoints: 0,
-        streak: 0,
-        activitiesCount: 0
-      };
-    }
-
-    const mine = activities.filter(
-      (activity) => activity.userId === profile.id && (!group || activity.groupId === group.id)
-    );
+    if (!profile) return { totalPoints: 0, monthlyPoints: 0, streak: 0, activitiesCount: 0 };
+    const mine = activities.filter((a) => a.userId === profile.id);
     return {
-      totalPoints: mine.reduce((total, activity) => total + activity.points, 0),
+      totalPoints: mine.reduce((t, a) => t + a.points, 0),
       monthlyPoints: mine
-        .filter((activity) => getMonthKey(activity.date) === monthKey)
-        .reduce((total, activity) => total + activity.points, 0),
+        .filter((a) => getMonthKey(a.date) === monthKey)
+        .reduce((t, a) => t + a.points, 0),
       streak: getStreak(profile.id, activities),
       activitiesCount: mine.length
     };
-  }, [activities, group, monthKey, profile]);
+  }, [activities, monthKey, profile]);
+
+  const levelInfo = useMemo(() => {
+    const totalPoints = myStats.totalPoints;
+    const level = Math.floor(totalPoints / XP_PER_LEVEL) + 1;
+    const currentXP = totalPoints % XP_PER_LEVEL;
+    const progress = (currentXP / XP_PER_LEVEL) * 100;
+    return { level, currentXP, progress, xpPerLevel: XP_PER_LEVEL };
+  }, [myStats.totalPoints]);
 
   const achievements = useMemo(() => getAchievements(profile, activities), [activities, profile]);
 
-  function createProfile(input: CreateProfileInput) {
+  async function createProfile(input: { name: string; phone: string; avatar: string }) {
+    const id = profile?.id ?? createId();
     const nextProfile: UserProfile = {
-      id: profile?.id ?? createId("user"),
+      id,
       name: input.name,
       phone: input.phone,
       avatar: input.avatar,
       createdAt: profile?.createdAt ?? new Date().toISOString()
     };
 
-    setStorage((current) => {
-      const updatedGroup =
-        current.group && current.group.members.some((member) => member.id === nextProfile.id)
-          ? {
-              ...current.group,
-              members: current.group.members.map((member) =>
-                member.id === nextProfile.id
-                  ? { ...member, name: nextProfile.name, avatar: nextProfile.avatar }
-                  : member
-              )
-            }
-          : current.group;
-
-      return {
-        ...current,
-        profile: nextProfile,
-        group: updatedGroup
-      };
+    const { error } = await supabase.from("profiles").upsert({
+      id: nextProfile.id,
+      name: nextProfile.name,
+      phone: nextProfile.phone,
+      avatar_url: nextProfile.avatar,
+      created_at: nextProfile.createdAt
     });
+
+    if (!error) {
+      setProfile(nextProfile);
+      localStorage.setItem("liferank.profile", JSON.stringify(nextProfile));
+      toast.success("Perfil salvo com sucesso!");
+    } else {
+      console.error("Erro Supabase (Profile):", error);
+      toast.error("Erro ao salvar perfil.");
+    }
   }
 
-  function createGroup(name: string) {
+  async function createGroup(name: string) {
     if (!profile) return;
+    const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const { data: newGroup } = await supabase
+      .from("groups")
+      .insert({ name, code, created_by: profile.id })
+      .select()
+      .single();
 
-    const nextGroup: GroupData = {
-      id: createId("group"),
-      code: Math.random().toString(36).slice(2, 8).toUpperCase(),
-      name,
-      createdAt: new Date().toISOString(),
-      members: getDemoMembers(profile)
-    };
-
-    setStorage((current) => ({
-      ...current,
-      group: nextGroup,
-      activities: [
-        ...createSeededActivities(nextGroup.id),
-        ...current.activities.filter(
-          (activity) => activity.userId === profile.id && activity.groupId === nextGroup.id
-        )
-      ]
-    }));
+    if (newGroup) {
+      await supabase
+        .from("memberships")
+        .insert({ profile_id: profile.id, group_id: newGroup.id });
+      
+      toast.success(`Grupo ${name} criado!`);
+      await loadUserGroupAndActivities(profile.id);
+    }
   }
 
-  function joinGroup(code: string) {
+  async function joinGroup(code: string) {
     if (!profile) return;
+    const { data: g } = await supabase
+      .from("groups")
+      .select("*")
+      .eq("code", code.toUpperCase())
+      .single();
 
-    const nextGroup: GroupData = {
-      id: createId("group"),
-      code: code.toUpperCase(),
-      name: `Grupo ${code.toUpperCase()}`,
-      createdAt: new Date().toISOString(),
-      members: getDemoMembers(profile)
-    };
+    if (g) {
+      const { error } = await supabase
+        .from("memberships")
+        .insert({ profile_id: profile.id, group_id: g.id });
 
-    setStorage((current) => ({
-      ...current,
-      group: nextGroup,
-      activities: [
-        ...createSeededActivities(nextGroup.id),
-        ...current.activities.filter(
-          (activity) => activity.userId === profile.id && activity.groupId === nextGroup.id
-        )
-      ]
-    }));
+      if (!error) {
+        toast.success(`Entrou no grupo ${g.name}!`);
+        await loadUserGroupAndActivities(profile.id);
+      } else {
+        toast.error("Você já está no grupo ou erro ao entrar.");
+      }
+    } else {
+      toast.error("Código inválido.");
+    }
   }
 
-  function addActivity(input: AddActivityInput) {
+  async function addActivity(input: { type: ActivityType; label?: string; date: string; hours?: number }) {
     if (!profile || !group) return;
-
     const typeConfig = activityCatalog[input.type];
-    const nextActivity: Activity = {
-      id: createId("activity"),
-      userId: profile.id,
-      userName: profile.name,
-      groupId: group.id,
+    const points = getActivityPoints(input.type, input.hours);
+
+    const { error } = await supabase.from("activities").insert({
+      profile_id: profile.id,
+      group_id: group.id,
       type: input.type,
       label: input.label?.trim() || typeConfig.label,
-      date: input.date,
-      createdAt: new Date().toISOString(),
-      points: getActivityPoints(input.type, input.hours),
-      hours: input.type === "study" ? Number(input.hours ?? 1) : undefined
-    };
+      points: points,
+      hours: input.type === "study" ? Number(input.hours ?? 1) : null,
+      date: input.date
+    });
 
-    setStorage((current) => ({
-      ...current,
-      activities: [nextActivity, ...current.activities]
-    }));
+    if (!error) {
+      toast.success(`+${points} pontos!`, { icon: typeConfig.emoji });
+    } else {
+      toast.error("Erro ao salvar atividade.");
+    }
   }
 
-  function resetMonthlySimulation() {
-    setStorage((current) => ({
-      ...current,
-      monthlyResetAt: new Date().toISOString()
-    }));
+  async function loginByName(name: string) {
+    const { data: dbProfile, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .ilike("name", name) // Busca ignorando maiúsculas/minúsculas
+      .single();
+
+    if (dbProfile) {
+      const mappedProfile: UserProfile = {
+        id: dbProfile.id,
+        name: dbProfile.name,
+        phone: dbProfile.phone,
+        avatar: dbProfile.avatar_url,
+        createdAt: dbProfile.created_at
+      };
+      setProfile(mappedProfile);
+      localStorage.setItem("liferank.profile", JSON.stringify(mappedProfile));
+      await loadUserGroupAndActivities(mappedProfile.id);
+      toast.success(`Bem-vindo de volta, ${mappedProfile.name}!`);
+      return true;
+    } else {
+      toast.error("perfil não encontrado com este nome.");
+      return false;
+    }
+  }
+
+  function logout() {
+    setProfile(null);
+    setGroup(null);
+    setActivities([]);
+    localStorage.removeItem("liferank.profile");
   }
 
   return {
@@ -219,12 +301,13 @@ export function useLifeRankStore() {
     activities,
     ranking,
     myStats,
+    levelInfo,
     achievements,
-    monthlyResetAt: storage.monthlyResetAt,
     createProfile,
     createGroup,
     joinGroup,
     addActivity,
-    resetMonthlySimulation
+    loginByName,
+    logout
   };
 }

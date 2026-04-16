@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { navigationItems } from "@/lib/constants";
@@ -18,7 +18,13 @@ import {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { profile, group } = useLifeRank();
+  const router = useRouter();
+  const { profile, group, logout, levelInfo } = useLifeRank();
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   const iconMap: Record<string, any> = {
     "/dashboard": BarChart3,
@@ -85,7 +91,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/profile" className="flex items-center gap-3 transition-opacity hover:opacity-80">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-bold text-accent-slate leading-none">{profile?.name ?? "Visitante"}</p>
-                  <p className="text-[10px] font-bold text-brand-500 mt-1 uppercase tracking-widest leading-none">Rank #01</p>
+                  <p className="text-[10px] font-bold text-brand-500 mt-1 uppercase tracking-widest leading-none">Nível {levelInfo.level}</p>
                 </div>
                 <div className="h-10 w-10 overflow-hidden rounded-2xl bg-slate-50 ring-2 ring-white shadow-sm">
                   {profile?.avatar ? (
@@ -98,6 +104,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   )}
                 </div>
               </Link>
+
+              <button
+                onClick={handleLogout}
+                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500 shadow-sm"
+                title="Sair do sistema"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -145,6 +159,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          
+          <button
+            onClick={handleLogout}
+            className="flex flex-col items-center gap-1 rounded-2xl px-4 py-3 text-slate-400 transition-all duration-300 hover:text-red-500"
+          >
+            <LogOut className="h-5 w-5 opacity-70" />
+            <span className="text-[10px] font-bold uppercase tracking-tighter">Sair</span>
+          </button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Panel } from "@/components/ui/panel";
 import { useLifeRank } from "@/components/providers/life-rank-provider";
@@ -9,11 +10,39 @@ import { ActivityType } from "@/lib/types";
 import { getTodayKey } from "@/lib/utils";
 
 export function ActivitiesPageContent() {
-  const { profile, group, activities, addActivity } = useLifeRank();
+  const { profile, group, activities, addActivity, levelInfo, achievements } = useLifeRank();
   const [type, setType] = useState<ActivityType>("study");
   const [hours, setHours] = useState(1);
   const [date, setDate] = useState(getTodayKey());
   const [customLabel, setCustomLabel] = useState("");
+
+  const prevLevel = useRef(levelInfo.level);
+  const prevAchievements = useRef(achievements.filter(a => a.unlocked).length);
+
+  useEffect(() => {
+    // Confetti on Level Up
+    if (levelInfo.level > prevLevel.current) {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#ff8a00", "#ffc107", "#ffffff"]
+      });
+      prevLevel.current = levelInfo.level;
+    }
+
+    // Confetti on Achievement Unlock
+    const unlockedCount = achievements.filter(a => a.unlocked).length;
+    if (unlockedCount > prevAchievements.current) {
+      confetti({
+        particleCount: 100,
+        spread: 50,
+        origin: { y: 0.8 },
+        colors: ["#10b981", "#34d399", "#ffffff"]
+      });
+      prevAchievements.current = unlockedCount;
+    }
+  }, [levelInfo.level, achievements]);
 
   const currentPoints = useMemo(() => {
     if (type === "study") return Math.max(1, hours) * activityCatalog.study.points;

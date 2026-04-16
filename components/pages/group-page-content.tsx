@@ -45,20 +45,20 @@ export function GroupPageContent() {
         <Panel>
           <p className="text-sm uppercase tracking-[0.22em] text-brand-600">Entrar em grupo</p>
           <p className="mt-2 text-sm text-slate-500">
-            Como nao existe backend, o codigo e ficticio e cria um grupo local para validacao do fluxo.
+            Tem um código de convite? Insira abaixo para se juntar ao seu squad.
           </p>
           <div className="mt-5 grid gap-4">
             <input
               value={inviteCode}
               onChange={(event) => setInviteCode(event.target.value)}
               className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-400"
-              placeholder="Codigo do grupo"
+              placeholder="Ex: LIFE123"
             />
             <button
               onClick={() => inviteCode.trim() && joinGroup(inviteCode.trim())}
-              className="rounded-2xl bg-accent-coral px-4 py-3 font-semibold text-white"
+              className="rounded-2xl bg-orange-600 px-4 py-3 font-semibold text-white transition-all hover:bg-orange-500 active:scale-95"
             >
-              Entrar com codigo
+              Entrar com código
             </button>
           </div>
         </Panel>

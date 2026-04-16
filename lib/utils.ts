@@ -1,8 +1,11 @@
 import { activityCatalog } from "@/lib/constants";
 import { Achievement, Activity, GroupData, RankingEntry, UserProfile } from "@/lib/types";
 
-export function createId(prefix: string) {
-  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+export function createId(prefix?: string) {
+  if (typeof window !== "undefined" && window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  return `${prefix ? prefix + "_" : ""}${Math.random().toString(36).slice(2, 10)}`;
 }
 
 export function formatDate(date: string) {

@@ -7,9 +7,11 @@ import { useLifeRank } from "@/components/providers/life-rank-provider";
 import { Trophy, Award, Zap, PlusCircle, ArrowRight } from "lucide-react";
 import { activityCatalog } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
+import { XPBar } from "@/components/ui/xp-bar";
+import { RankBadge } from "@/components/ui/badge";
 
 export function DashboardPageContent() {
-  const { profile, group, activities, ranking, myStats, achievements, monthlyResetAt, resetMonthlySimulation } =
+  const { profile, group, activities, ranking, myStats, levelInfo, achievements } =
     useLifeRank();
 
   if (!profile) {
@@ -23,10 +25,18 @@ export function DashboardPageContent() {
 
   if (!group) {
     return (
-      <EmptyState
-        title="Entre em um grupo para competir"
-        description="Crie um grupo proprio ou use um codigo ficticio para visualizar ranking, calendario e feed."
-      />
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <EmptyState
+          title="Faltou o seu squad!"
+          description="Para ver o ranking e competir, você precisa criar um grupo ou entrar em um convite existente."
+        />
+        <Link 
+          href="/group"
+          className="mt-6 rounded-2xl bg-brand-600 px-8 py-4 font-bold text-white shadow-lg shadow-brand-500/20 transition-all hover:bg-brand-700 hover:scale-105 active:scale-95"
+        >
+          Configurar meu Grupo
+        </Link>
+      </div>
     );
   }
 
@@ -39,6 +49,13 @@ export function DashboardPageContent() {
 
   return (
     <div className="grid gap-10">
+      <XPBar 
+        level={levelInfo.level} 
+        currentXP={levelInfo.currentXP} 
+        xpPerLevel={levelInfo.xpPerLevel} 
+        progress={levelInfo.progress} 
+      />
+
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {[
           { label: "Pontos mensais", value: myStats.monthlyPoints, icon: Trophy },
@@ -90,16 +107,13 @@ export function DashboardPageContent() {
             </div>
 
             <div className="rounded-[40px] border border-brand-100 bg-brand-50/30 p-8">
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-600">Próximo Reset</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-600">Fichas de Treino</p>
               <p className="mt-4 text-xl font-bold text-accent-slate">
-                {monthlyResetAt ? formatDate(monthlyResetAt) : "Ciclo inicial ativo"}
+                Em breve
               </p>
-              <button
-                onClick={resetMonthlySimulation}
-                className="mt-6 text-sm font-bold text-brand-600 hover:text-brand-700 underline underline-offset-8"
-              >
-                Simular fechamento
-              </button>
+              <p className="mt-6 text-sm font-medium text-slate-400">
+                Acompanhe seus planos diretamente aqui.
+              </p>
             </div>
           </div>
         </div>
@@ -160,18 +174,20 @@ export function DashboardPageContent() {
           <h2 className="text-2xl font-bold text-accent-slate tracking-tight mb-8">Top do Mês</h2>
           <div className="grid gap-4">
             {ranking.slice(0, 3).map((entry, index) => (
-              <div key={entry.userId} className="flex items-center gap-5 rounded-[32px] border border-slate-50 p-4 transition-all hover:shadow-2xl hover:shadow-brand-500/5">
-                <div className={`h-14 w-14 flex items-center justify-center rounded-2xl text-lg font-black shadow-sm ${index === 0 ? "bg-amber-400 text-white" : index === 1 ? "bg-slate-300 text-white" : "bg-orange-300 text-white"}`}>
-                  #{index + 1}
-                </div>
-                <div className="h-14 w-14 overflow-hidden rounded-2xl bg-slate-100 ring-2 ring-white shadow-sm">
-                  {entry.avatar && <img src={entry.avatar} className="h-full w-full object-cover" />}
+              <div key={entry.userId} className="group flex items-center gap-5 rounded-[32px] border border-slate-50 p-4 transition-all hover:shadow-2xl hover:shadow-brand-500/5">
+                <div className="relative">
+                  <div className="h-14 w-14 overflow-hidden rounded-2xl bg-slate-100 ring-2 ring-white shadow-sm">
+                    {entry.avatar && <img src={entry.avatar} className="h-full w-full object-cover" />}
+                  </div>
+                  <RankBadge rank={index + 1} className="absolute -top-2 -right-2 z-10 scale-75" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-accent-slate truncate">{entry.name}</p>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{entry.activitiesCount} Ativ.</p>
                 </div>
-                <p className="text-xl font-black text-brand-600">{entry.points} <span className="text-xs font-bold text-slate-300">pts</span></p>
+                <p className="text-xl font-black text-brand-600">
+                  {entry.points} <span className="text-xs font-bold text-slate-300 uppercase">pts</span>
+                </p>
               </div>
             ))}
           </div>

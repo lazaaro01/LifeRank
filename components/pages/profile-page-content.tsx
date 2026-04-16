@@ -2,10 +2,12 @@
 
 import { ChangeEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { User, Phone, Image as ImageIcon, Check, ArrowRight, Camera, Award, Sparkles } from "lucide-react";
 import { useLifeRank } from "@/components/providers/life-rank-provider";
 
 export function ProfilePageContent() {
+  const router = useRouter();
   const { profile, createProfile } = useLifeRank();
   const [name, setName] = useState(profile?.name ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
@@ -33,6 +35,7 @@ export function ProfilePageContent() {
     await new Promise(resolve => setTimeout(resolve, 800));
     createProfile({ name: name.trim(), phone: phone.trim(), avatar: avatar.trim() });
     setIsSubmitting(false);
+    router.push("/dashboard");
   }
 
   return (
@@ -46,9 +49,23 @@ export function ProfilePageContent() {
         {/* Form Section */}
         <div className="flex flex-col justify-center space-y-10">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1">
-              <Sparkles className="h-3 w-3 text-brand-500" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">Onboarding</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1">
+                <Sparkles className="h-3 w-3 text-brand-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">
+                  {profile ? "Conta Ativa" : "Onboarding"}
+                </span>
+              </div>
+              
+              {profile && (
+                <button 
+                  onClick={() => router.push("/dashboard")}
+                  className="text-xs font-bold text-slate-400 hover:text-brand-500 transition-colors flex items-center gap-1"
+                >
+                  <ArrowRight className="h-3 w-3 rotate-180" />
+                  Voltar ao Dashboard
+                </button>
+              )}
             </div>
             <h1 className="text-5xl font-bold tracking-tight text-accent-slate">
               {profile ? "Atualize seu perfil" : "Comece sua jornada"}
