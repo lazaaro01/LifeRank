@@ -46,7 +46,6 @@ export function ProfilePageContent() {
         transition={{ duration: 0.6 }}
         className="grid gap-16 lg:grid-cols-2"
       >
-        {/* Form Section */}
         <div className="flex flex-col justify-center space-y-10">
           <div>
             <div className="flex items-center justify-between mb-4">

@@ -38,7 +38,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col font-sans">
-      {/* Background Blobs */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-brand-400/5 blur-[120px]" />
         <div className="absolute -right-[10%] -bottom-[10%] h-[500px] w-[500px] rounded-full bg-accent-sun/5 blur-[120px]" />

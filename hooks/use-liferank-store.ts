@@ -23,7 +23,6 @@ export function useLifeRankStore() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
-  // 1. Carregar Dados do Grupo e Atividades
   async function loadUserGroupAndActivities(userId: string) {
     const { data: membership } = await supabase
       .from("memberships")
@@ -112,8 +111,6 @@ export function useLifeRankStore() {
     }
     init();
   }, []);
-
-  // 3. Realtime Listener
   useEffect(() => {
     if (!profile || !group) return;
 

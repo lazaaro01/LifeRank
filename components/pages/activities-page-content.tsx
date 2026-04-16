@@ -20,7 +20,6 @@ export function ActivitiesPageContent() {
   const prevAchievements = useRef(achievements.filter(a => a.unlocked).length);
 
   useEffect(() => {
-    // Confetti on Level Up
     if (levelInfo.level > prevLevel.current) {
       confetti({
         particleCount: 150,
@@ -31,7 +30,6 @@ export function ActivitiesPageContent() {
       prevLevel.current = levelInfo.level;
     }
 
-    // Confetti on Achievement Unlock
     const unlockedCount = achievements.filter(a => a.unlocked).length;
     if (unlockedCount > prevAchievements.current) {
       confetti({
