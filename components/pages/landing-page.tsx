@@ -20,11 +20,18 @@ export function LandingPage() {
   const { loginByName } = useLifeRank();
   const [loginName, setLoginName] = useState("");
   const [showLogin, setShowLogin] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (!loginName.trim()) return;
+    
+    setIsLoggingIn(true);
+    // Simular um pequeno delay para feedback visual
+    await new Promise(resolve => setTimeout(resolve, 800));
     const success = await loginByName(loginName.trim());
+    setIsLoggingIn(false);
+    
     if (success) {
       router.push("/dashboard");
     }
@@ -69,13 +76,22 @@ export function LandingPage() {
               <form onSubmit={handleLogin} className="flex items-center gap-2">
                 <input 
                   autoFocus
+                  disabled={isLoggingIn}
                   value={loginName}
                   onChange={(e) => setLoginName(e.target.value)}
                   placeholder="Seu nome..." 
-                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs outline-none focus:border-brand-500" 
+                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs outline-none focus:border-brand-500 disabled:opacity-50" 
                 />
-                <button type="submit" className="rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-600">
-                  Acessar
+                <button 
+                  type="submit" 
+                  disabled={isLoggingIn}
+                  className="rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-600 disabled:opacity-50 flex items-center justify-center min-w-[70px]"
+                >
+                  {isLoggingIn ? (
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    "Acessar"
+                  )}
                 </button>
               </form>
             )}
@@ -97,7 +113,7 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-6xl font-bold tracking-tight text-accent-slate sm:text-8xl"
+              className="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-tight text-accent-slate"
             >
               Domine sua rotina <br />
               <span className="text-brand-500">com maestria.</span>
@@ -107,9 +123,9 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-slate-500"
+              className="mx-auto mt-6 md:mt-8 max-w-2xl text-base md:text-lg leading-7 md:leading-8 text-slate-500"
             >
-              LifeRank transforma seus hábitos diários em uma experiência competitiva e gratificante. 
+              LifeRank transforma seus hábitos diários em uma experiênca competitiva e gratificante. 
               Suba no ranking, conquiste vitórias e veja sua evolução real.
             </motion.p>
 
@@ -117,11 +133,11 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="mt-12 flex flex-col items-center justify-center gap-8 sm:flex-row"
+              className="mt-10 md:mt-12 flex flex-col items-center justify-center gap-6 md:gap-8 sm:flex-row"
             >
               <button
                 onClick={() => router.push("/profile")}
-                className="group relative overflow-hidden rounded-full bg-accent-slate px-10 py-5 text-lg font-bold text-white transition-all hover:bg-black hover:px-12 active:scale-95"
+                className="group relative w-full sm:w-auto overflow-hidden rounded-full bg-accent-slate px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-bold text-white transition-all hover:bg-black hover:px-12 active:scale-95"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   Criar minha conta
@@ -164,13 +180,13 @@ export function LandingPage() {
               <motion.div 
                 key={i} 
                 variants={item}
-                className="group rounded-[40px] border border-slate-100 bg-slate-50/30 p-10 transition-all hover:bg-white hover:shadow-2xl hover:shadow-brand-500/5"
+                className="group rounded-[32px] md:rounded-[40px] border border-slate-100 bg-slate-50/30 p-8 md:p-10 transition-all hover:bg-white hover:shadow-2xl hover:shadow-brand-500/5"
               >
-                <div className={`mb-8 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-white shadow-sm transition-transform group-hover:scale-110`}>
-                  <f.icon className="h-7 w-7 text-brand-500" />
+                <div className={`mb-6 md:mb-8 inline-flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-2xl md:rounded-3xl bg-white shadow-sm transition-transform group-hover:scale-110`}>
+                  <f.icon className="h-6 w-6 md:h-7 md:w-7 text-brand-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-accent-slate">{f.title}</h3>
-                <p className="mt-4 text-slate-500 leading-relaxed">{f.desc}</p>
+                <h3 className="text-xl md:text-2xl font-bold text-accent-slate">{f.title}</h3>
+                <p className="mt-4 text-sm md:text-base text-slate-500 leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </motion.div>

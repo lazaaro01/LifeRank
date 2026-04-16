@@ -39,14 +39,14 @@ export function ProfilePageContent() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl py-12">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 md:py-12">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="grid gap-16 lg:grid-cols-2"
+        className="grid gap-12 lg:gap-16 lg:grid-cols-2"
       >
-        <div className="flex flex-col justify-center space-y-10">
+        <div className="flex flex-col justify-center space-y-8 md:space-y-10">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1">
@@ -66,10 +66,10 @@ export function ProfilePageContent() {
                 </button>
               )}
             </div>
-            <h1 className="text-5xl font-bold tracking-tight text-accent-slate">
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-accent-slate">
               {profile ? "Atualize seu perfil" : "Comece sua jornada"}
             </h1>
-            <p className="mt-4 text-lg text-slate-500">
+            <p className="mt-4 text-base md:text-lg text-slate-500">
               Personalize sua identidade digital para o ranking.
             </p>
           </div>
@@ -144,8 +144,8 @@ export function ProfilePageContent() {
         <div className="relative isolate flex items-center justify-center">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(255,138,0,0.08),transparent_70%)]" />
           
-          <div className="w-full max-w-sm rounded-[56px] border border-slate-100 bg-white p-10 shadow-2xl shadow-brand-500/10">
-            <div className="mb-10 flex items-center justify-between">
+          <div className="w-full max-w-sm rounded-[42px] md:rounded-[56px] border border-slate-100 bg-white p-6 md:p-10 shadow-2xl shadow-brand-500/10">
+            <div className="mb-6 md:mb-10 flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">LifeRank Identity</span>
               <AnimatePresence>
                 {name && (
@@ -155,35 +155,35 @@ export function ProfilePageContent() {
                 )}
               </AnimatePresence>
             </div>
-
+ 
             <div className="flex flex-col items-center">
-              <div className="relative mb-8">
-                <div className="h-40 w-40 overflow-hidden rounded-[48px] bg-slate-50 ring-8 ring-brand-50 shadow-inner">
+              <div className="relative mb-6 md:mb-8">
+                <div className="h-32 w-32 md:h-40 md:w-40 overflow-hidden rounded-[36px] md:rounded-[48px] bg-slate-50 ring-6 md:ring-8 ring-brand-50 shadow-inner">
                   {avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={avatar} alt="Preview" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-200">
-                      <User className="h-20 w-20" />
+                      <User className="h-16 w-16 md:h-20 md:w-20" />
                     </div>
                   )}
                 </div>
-                <div className="absolute -bottom-3 -right-3 rounded-2xl bg-brand-500 p-3 text-white shadow-xl shadow-brand-500/30">
-                  <Award className="h-6 w-6" />
+                <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 rounded-xl md:rounded-2xl bg-brand-500 p-2 md:p-3 text-white shadow-xl shadow-brand-500/30">
+                  <Award className="h-5 w-5 md:h-6 md:w-6" />
                 </div>
               </div>
-
-              <h3 className="text-3xl font-bold tracking-tight text-accent-slate">{name || "Seu Nome"}</h3>
-              <p className="mt-2 font-medium text-slate-400">{phone || "(00) 00000-0000"}</p>
+ 
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-accent-slate">{name || "Seu Nome"}</h3>
+              <p className="mt-2 text-sm md:text-base font-medium text-slate-400">{phone || "(00) 00000-0000"}</p>
               
-              <div className="mt-12 flex w-full gap-4">
-                <div className="flex-1 rounded-3xl bg-slate-50 p-6 text-center">
+              <div className="mt-8 md:mt-12 flex w-full gap-3 md:gap-4">
+                <div className="flex-1 rounded-2xl md:rounded-3xl bg-slate-50 p-4 md:p-6 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nível</p>
-                  <p className="mt-1 text-2xl font-black text-brand-500">01</p>
+                  <p className="mt-1 text-xl md:text-2xl font-black text-brand-500">01</p>
                 </div>
-                <div className="flex-1 rounded-3xl bg-slate-50 p-6 text-center">
+                <div className="flex-1 rounded-2xl md:rounded-3xl bg-slate-50 p-4 md:p-6 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Score</p>
-                  <p className="mt-1 text-2xl font-black text-brand-500">00</p>
+                  <p className="mt-1 text-xl md:text-2xl font-black text-brand-500">00</p>
                 </div>
               </div>
             </div>
