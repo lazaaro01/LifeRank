@@ -38,26 +38,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col font-sans">
+    <div className="relative flex min-h-screen w-full flex-col font-sans overflow-x-hidden">
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-brand-400/5 blur-[120px]" />
-        <div className="absolute -right-[10%] -bottom-[10%] h-[500px] w-[500px] rounded-full bg-accent-sun/5 blur-[120px]" />
+        <div className="absolute -left-[10vw] -top-[10vw] h-[60vw] w-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-brand-400/5 blur-[18vw]" />
+        <div className="absolute -right-[10vw] -bottom-[10vw] h-[60vw] w-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-accent-sun/5 blur-[18vw]" />
       </div>
 
-      <header className="sticky top-0 z-40 w-full px-3 pt-3 md:px-6 md:pt-6">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-[24px] md:rounded-[32px] border border-slate-100 bg-white/70 px-4 py-3 md:px-6 md:py-4 backdrop-blur-xl shadow-lg shadow-brand-500/5 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
+      <header className="sticky top-0 z-40 w-full px-2 pt-2 sm:px-3 sm:pt-3 md:px-6 md:pt-6">
+        <div className="mx-auto max-w-full sm:max-w-2xl md:max-w-7xl">
+          <div className="rounded-2xl md:rounded-[32px] border border-slate-100 bg-white/70 px-2 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 backdrop-blur-xl shadow-lg shadow-brand-500/5 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 group shrink-0 min-w-0">
               <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl md:rounded-2xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">
                 <Trophy className="h-5 w-5 md:h-6 md:w-6" />
               </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-bold tracking-tight text-accent-slate">LifeRank</p>
-                <p className="text-[10px] uppercase tracking-tighter text-brand-600 font-bold">Premium Edition</p>
+              <div className="hidden sm:block min-w-0">
+                <p className="text-sm font-bold tracking-tight text-accent-slate truncate">LifeRank</p>
+                <p className="text-[10px] uppercase tracking-tighter text-brand-600 font-bold truncate">Premium Edition</p>
               </div>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1 flex-wrap min-w-0">
               {navigationItems.map((item) => {
                 const Icon = iconMap[item.href] || PlusCircle;
                 const isActive = pathname === item.href;
@@ -120,8 +120,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 px-4 py-8 md:px-6 md:py-12">
-        <div className="mx-auto max-w-7xl">
+      <main className="flex-1 px-2 py-4 sm:px-4 sm:py-8 md:px-6 md:py-12">
+        <div className="mx-auto max-w-full sm:max-w-2xl md:max-w-7xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
@@ -136,8 +136,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </main>
 
-      <div className="md:hidden sticky bottom-6 z-40 w-full px-4 pointer-events-none">
-        <div className="mx-auto flex max-w-md items-center justify-around rounded-[28px] border border-slate-100 bg-white/90 p-1.5 backdrop-blur-xl shadow-2xl shadow-brand-500/10 pointer-events-auto">
+      <div className="md:hidden sticky bottom-4 z-40 w-full px-2 sm:px-4 pointer-events-none">
+        <div className="mx-auto flex w-full max-w-xs sm:max-w-md items-center justify-around rounded-2xl border border-slate-100 bg-white/90 p-1 backdrop-blur-xl shadow-2xl shadow-brand-500/10 pointer-events-auto">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.href] || PlusCircle;
             const isActive = pathname === item.href;
