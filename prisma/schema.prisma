@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String  @id @default(uuid())
+  name         String
+  username     String  @unique
+  email        String  @unique
+  passwordHash String
+  avatarUrl    String?
+  phone        String?
+  bio          String?
+
+  points        Int @default(0)
+  xp            Int @default(0)
+  level         Int @default(1)
+  currentStreak Int @default(0)
+  bestStreak    Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities        Activity[]
+  customCategories  Category[]
+  achievements      UserAchievement[]
+  ownedClubs        Club[]
+  clubMemberships   ClubMembership[]
+
+  @@map("users")
+}
+
+model Category {
+  id            String  @id @default(uuid())
+  name          String
+  icon          String
+  pointsPerUnit Int
+  unit          String
+  isCustom      Boolean @default(false)
+
+  ownerId String?
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  activities Activity[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([name, ownerId])
+  @@map("categories")
+}
+
+model Activity {
+  id       String @id @default(uuid())
+  title    String
+  quantity Float
+  points   Int
+  xpEarned Int
+
+  occurredAt DateTime
+  createdAt  DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@map("activities")
+}
+
+model Achievement {
+  id          String @id @default(uuid())
+  code        String @unique
+  title       String
+  description String
+  icon        String
+
+  createdAt DateTime @default(now())
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Club {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  category    String
+  isPrivate   Boolean @default(false)
+  inviteCode  String  @unique
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  members ClubMembership[]
+
+  createdAt DateTime @default(now())
+
+  @@map("clubs")
+}
+
+enum ClubRole {
+  OWNER
+  MEMBER
+}
+
+model ClubMembership {
+  id String @id @default(uuid())
+
+  clubId String
+  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role     ClubRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  @@unique([clubId, userId])
+  @@map("club_memberships")
+}
