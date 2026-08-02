@@ -59,7 +59,19 @@ export async function loginAction(input: unknown): Promise<ActionResult> {
     if (error instanceof AuthError) {
       return { success: false, error: "Email ou senha incorretos" };
     }
-    throw error;
+    if (
+      error instanceof Error &&
+      "digest" in error &&
+      typeof error.digest === "string" &&
+      error.digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    console.error("[loginAction] Falha inesperada ao entrar:", error);
+    return {
+      success: false,
+      error: "Erro inesperado ao entrar. Tente novamente em instantes.",
+    };
   }
 
   redirect("/dashboard");

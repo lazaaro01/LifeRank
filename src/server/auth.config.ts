@@ -6,6 +6,7 @@ import type { NextAuthConfig } from "next-auth";
  * which needs Node.js APIs to hit the database.
  */
 export default {
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
@@ -15,14 +16,12 @@ export default {
       if (user) {
         token.id = user.id;
         token.username = user.username;
-        token.avatarUrl = user.avatarUrl;
       }
       return token;
     },
     session({ session, token }) {
       session.user.id = token.id;
       session.user.username = token.username;
-      session.user.avatarUrl = token.avatarUrl;
       return session;
     },
   },

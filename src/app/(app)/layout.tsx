@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/server/auth";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { userService } from "@/services/user.service";
 
 export default async function AppLayout({
   children,
@@ -14,12 +15,14 @@ export default async function AppLayout({
     redirect("/login");
   }
 
+  const profile = await userService.getProfile(session.user.id);
+
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader
         user={{
           name: session.user.name ?? session.user.username,
-          avatarUrl: session.user.avatarUrl,
+          avatarUrl: profile?.avatarUrl ?? null,
         }}
       />
       <main className="mx-auto w-full max-w-[1280px] flex-1 px-6 py-8">
