@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { logoutAction } from "@/server/actions/auth.actions";
 
 type SiteHeaderProps = {
   variant?: "full" | "minimal";
@@ -64,21 +66,51 @@ export function SiteHeader({ variant = "full", user }: SiteHeaderProps) {
             </nav>
 
             <div className="flex items-center gap-4">
-              <Button
-                render={<Link href={user ? "/clubs/new" : "/register"} />}
-                className="rounded-full uppercase"
-              >
-                {user ? "Criar clube" : "Criar conta"}
-              </Button>
-              {user && (
-                <Link href="/profile">
-                  <Avatar className="border-primary border-2">
-                    {user.avatarUrl && (
-                      <AvatarImage src={user.avatarUrl} alt={user.name} />
-                    )}
-                    <AvatarFallback>{initials(user.name)}</AvatarFallback>
-                  </Avatar>
-                </Link>
+              {user ? (
+                <>
+                  <Button
+                    render={<Link href="/clubs/new" />}
+                    className="rounded-full uppercase"
+                  >
+                    Criar clube
+                  </Button>
+                  <form action={logoutAction}>
+                    <Button
+                      type="submit"
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive"
+                      aria-label="Sair"
+                      title="Sair"
+                    >
+                      <LogOut />
+                    </Button>
+                  </form>
+                  <Link href="/profile">
+                    <Avatar className="border-primary border-2">
+                      {user.avatarUrl && (
+                        <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      )}
+                      <AvatarFallback>{initials(user.name)}</AvatarFallback>
+                    </Avatar>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Button
+                    render={<Link href="/login" />}
+                    variant="outline"
+                    className="rounded-full uppercase"
+                  >
+                    Entrar
+                  </Button>
+                  <Button
+                    render={<Link href="/register" />}
+                    className="rounded-full uppercase"
+                  >
+                    Criar conta
+                  </Button>
+                </>
               )}
             </div>
           </>
