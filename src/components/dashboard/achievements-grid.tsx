@@ -18,7 +18,7 @@ export function AchievementsGrid({ unlocked, locked }: AchievementsGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
       {unlocked.map(({ achievement }) => (
         <AchievementBadge key={achievement.id} achievement={achievement} unlocked />
       ))}
@@ -40,7 +40,7 @@ function AchievementBadge({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-2 rounded-2xl border p-3 text-center",
+        "flex flex-col items-center gap-1.5 rounded-2xl border p-2 text-center sm:gap-2 sm:p-3",
         unlocked
           ? "border-primary/20 bg-primary/5"
           : "border-border opacity-40"
@@ -49,15 +49,17 @@ function AchievementBadge({
     >
       <div
         className={cn(
-          "flex size-10 items-center justify-center rounded-full",
+          "flex size-8 items-center justify-center rounded-full sm:size-10",
           unlocked
             ? "bg-primary text-primary-foreground"
             : "bg-muted text-muted-foreground"
         )}
       >
-        <Icon className="size-5" />
+        <Icon className="size-4 sm:size-5" />
       </div>
-      <p className="text-xs leading-tight font-medium">{achievement.title}</p>
+      <p className="text-[10px] leading-tight font-medium sm:text-xs">
+        {achievement.title}
+      </p>
     </div>
   );
 }

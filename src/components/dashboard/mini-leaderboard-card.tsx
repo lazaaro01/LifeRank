@@ -27,7 +27,7 @@ export function MiniLeaderboardCard({
 }: MiniLeaderboardCardProps) {
   if (!clubName) {
     return (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-8 text-center">
+      <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6 text-center sm:p-8">
         <Trophy className="text-muted-foreground size-8" />
         <p className="text-sm font-medium">
           Entre em um clube para ver o ranking entre amigos
@@ -42,9 +42,11 @@ export function MiniLeaderboardCard({
   }
 
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex h-full flex-col gap-4 sm:gap-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold uppercase">{clubName}</h3>
+        <h3 className="text-base font-semibold uppercase sm:text-lg">
+          {clubName}
+        </h3>
         <Trophy className="text-muted-foreground size-5" />
       </div>
 

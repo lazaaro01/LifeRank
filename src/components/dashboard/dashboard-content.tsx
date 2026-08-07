@@ -19,7 +19,10 @@ const EvolutionChart = dynamic(
     import("@/components/dashboard/evolution-chart").then(
       (mod) => mod.EvolutionChart
     ),
-  { ssr: false, loading: () => <Skeleton className="h-[220px] w-full" /> }
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[160px] w-full sm:h-[220px]" />,
+  }
 );
 
 const container: Variants = {
@@ -55,7 +58,7 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-4 pb-24"
+      className="space-y-3 pb-24 sm:space-y-4"
     >
       <motion.div variants={item}>
         <LevelHero
@@ -67,8 +70,8 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
         />
       </motion.div>
 
-      <div className="grid gap-4 lg:grid-cols-12">
-        <div className="flex flex-col gap-4 lg:col-span-4">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-12">
+        <div className="flex flex-col gap-3 sm:gap-4 lg:col-span-4">
           <motion.div variants={item}>
             <StreakCard
               currentStreak={user.currentStreak}
@@ -78,10 +81,10 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
 
           <motion.div
             variants={item}
-            className="flex-1 rounded-xl border bg-white p-8"
+            className="flex-1 rounded-xl border bg-white p-4 sm:p-8"
           >
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-semibold uppercase">
+            <div className="mb-4 flex items-center justify-between sm:mb-6">
+              <h3 className="text-base font-semibold uppercase sm:text-xl">
                 Badges desbloqueados
               </h3>
               <Link href="/profile" className="text-primary text-sm">
@@ -95,28 +98,37 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
           </motion.div>
         </div>
 
-        <div className="flex flex-col gap-4 lg:col-span-8">
-          <motion.div variants={item} className="rounded-xl border bg-white p-8">
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold uppercase">
+        <div className="flex flex-col gap-3 sm:gap-4 lg:col-span-8">
+          <motion.div
+            variants={item}
+            className="rounded-xl border bg-white p-4 sm:p-8"
+          >
+            <div className="mb-3 sm:mb-4">
+              <h3 className="text-base font-semibold uppercase sm:text-xl">
                 Momentum semanal
               </h3>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-xs sm:text-sm">
                 Sua evolução de pontos nos últimos 30 dias.
               </p>
             </div>
             <EvolutionChart data={evolution} />
           </motion.div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <motion.div variants={item} className="rounded-xl border bg-white p-6">
-              <h3 className="mb-4 text-xl font-semibold uppercase">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+            <motion.div
+              variants={item}
+              className="rounded-xl border bg-white p-4 sm:p-6"
+            >
+              <h3 className="mb-3 text-base font-semibold uppercase sm:mb-4 sm:text-xl">
                 Ganhos recentes
               </h3>
               <RecentActivities activities={recentActivities} />
             </motion.div>
 
-            <motion.div variants={item} className="rounded-xl border bg-white p-6">
+            <motion.div
+              variants={item}
+              className="rounded-xl border bg-white p-4 sm:p-6"
+            >
               <MiniLeaderboardCard
                 clubName={club?.name ?? null}
                 members={club?.ranking ?? []}

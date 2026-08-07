@@ -19,19 +19,22 @@ export function RecentActivities({ activities }: RecentActivitiesProps) {
       {activities.map((activity) => {
         const Icon = getIcon(activity.category.icon);
         return (
-          <li key={activity.id} className="flex items-center gap-4 px-2 py-4">
-            <div className="bg-primary/10 flex size-10 shrink-0 items-center justify-center rounded-full">
+          <li
+            key={activity.id}
+            className="flex items-center gap-3 px-2 py-3 sm:gap-4 sm:py-4"
+          >
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10">
               <Icon className="text-primary size-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium uppercase">
+              <p className="truncate text-xs font-medium uppercase sm:text-sm">
                 {activity.title}
               </p>
               <p className="text-muted-foreground text-xs">
                 {activity.occurredAt.toLocaleDateString("pt-BR")}
               </p>
             </div>
-            <span className="text-primary shrink-0 text-lg font-semibold tabular-nums">
+            <span className="text-primary shrink-0 text-base font-semibold tabular-nums sm:text-lg">
               +{activity.xpEarned} XP
             </span>
           </li>

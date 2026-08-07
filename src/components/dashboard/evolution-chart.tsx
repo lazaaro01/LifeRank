@@ -18,7 +18,7 @@ const chartConfig = {
 
 export function EvolutionChart({ data }: { data: DashboardData["evolution"] }) {
   return (
-    <ChartContainer config={chartConfig} className="h-[220px] w-full">
+    <ChartContainer config={chartConfig} className="h-[160px] w-full sm:h-[220px]">
       <AreaChart data={data} margin={{ left: 0, right: 0 }}>
         <CartesianGrid vertical={false} strokeOpacity={0.3} />
         <XAxis
