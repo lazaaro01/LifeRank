@@ -29,18 +29,20 @@ export function LevelHero({
   const xpRemaining = Math.max(xpForNextLevel - xpIntoLevel, 0);
 
   return (
-    <div className="bg-primary text-primary-foreground relative flex flex-col gap-8 overflow-hidden rounded-xl p-8 sm:flex-row sm:items-center sm:justify-between sm:p-12">
-      <span className="font-heading pointer-events-none absolute -top-10 -right-10 text-[160px] uppercase opacity-10 select-none">
+    <div className="bg-primary text-primary-foreground relative flex flex-col gap-6 overflow-hidden rounded-xl p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-12">
+      <span className="font-heading pointer-events-none absolute -top-10 -right-10 hidden text-[160px] uppercase opacity-10 select-none sm:block">
         Level
       </span>
 
-      <div className="relative z-10 flex-1 space-y-4">
+      <div className="relative z-10 flex-1 space-y-3 sm:space-y-4">
         <p className="text-xs font-medium tracking-widest uppercase opacity-80">
           Status nível de elite
         </p>
-        <p className="font-heading flex items-baseline gap-3 text-6xl uppercase sm:text-7xl">
+        <p className="font-heading flex flex-wrap items-baseline gap-2 text-4xl uppercase sm:gap-3 sm:text-6xl lg:text-7xl">
           Nível {level}
-          <span className="text-lg font-normal opacity-70">PRO</span>
+          <span className="text-base font-normal opacity-70 sm:text-lg">
+            PRO
+          </span>
         </p>
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-medium tracking-wide uppercase">
@@ -62,7 +64,7 @@ export function LevelHero({
         <p className="text-xs font-medium tracking-widest uppercase opacity-80">
           Pontos disponíveis
         </p>
-        <p className="text-5xl font-semibold sm:text-6xl">
+        <p className="text-4xl font-semibold sm:text-6xl">
           {points.toLocaleString("pt-BR")}
         </p>
         <Button

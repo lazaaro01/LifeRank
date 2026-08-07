@@ -61,7 +61,7 @@ export function ActivityHistoryContent({
     <div className="space-y-8">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
         <div className="max-w-xl space-y-1">
-          <h1 className="font-heading text-4xl uppercase sm:text-5xl">
+          <h1 className="font-heading text-3xl uppercase sm:text-5xl">
             Histórico de atividades
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -69,35 +69,41 @@ export function ActivityHistoryContent({
           </p>
         </div>
 
-        <div className="flex gap-3">
-          <Card size="sm" className="min-w-28 items-center text-center">
+        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:gap-3">
+          <Card size="sm" className="items-center text-center sm:min-w-28">
             <CardContent>
               <p className="text-muted-foreground text-xs uppercase">Total XP</p>
-              <p className="text-primary text-2xl font-semibold">{stats.totalXp}</p>
+              <p className="text-primary text-xl font-semibold sm:text-2xl">
+                {stats.totalXp}
+              </p>
             </CardContent>
           </Card>
-          <Card size="sm" className="min-w-28 items-center text-center">
+          <Card size="sm" className="items-center text-center sm:min-w-28">
             <CardContent>
               <p className="text-muted-foreground text-xs uppercase">Atividades</p>
-              <p className="text-2xl font-semibold">{stats.activityCount}</p>
+              <p className="text-xl font-semibold sm:text-2xl">
+                {stats.activityCount}
+              </p>
             </CardContent>
           </Card>
           <Card
             size="sm"
-            className="bg-primary text-primary-foreground min-w-28 items-center text-center"
+            className="bg-primary text-primary-foreground items-center text-center sm:min-w-28"
           >
             <CardContent>
               <p className="text-xs uppercase opacity-80">Streak</p>
-              <p className="text-2xl font-semibold">{stats.currentStreak}</p>
+              <p className="text-xl font-semibold sm:text-2xl">
+                {stats.currentStreak}
+              </p>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <div className="bg-muted flex flex-wrap items-center gap-2 rounded-full p-2">
+      <div className="bg-muted flex items-center gap-2 overflow-x-auto rounded-full p-2">
         <Link
           href="/activities"
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
             activeCategoryId === null
               ? "bg-primary text-primary-foreground"
               : "bg-background text-muted-foreground hover:text-foreground"
@@ -109,7 +115,7 @@ export function ActivityHistoryContent({
           <Link
             key={category.id}
             href={`/activities?category=${category.id}`}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               activeCategoryId === category.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-background text-muted-foreground hover:text-foreground"

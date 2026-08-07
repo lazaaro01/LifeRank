@@ -6,6 +6,7 @@ import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logoutAction } from "@/server/actions/auth.actions";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 type SiteHeaderProps = {
   variant?: "full" | "minimal";
@@ -65,7 +66,9 @@ export function SiteHeader({ variant = "full", user }: SiteHeaderProps) {
               })}
             </nav>
 
-            <div className="flex items-center gap-4">
+            <MobileNav links={NAV_LINKS} pathname={pathname} user={user} />
+
+            <div className="hidden items-center gap-4 md:flex">
               {user ? (
                 <>
                   <Button

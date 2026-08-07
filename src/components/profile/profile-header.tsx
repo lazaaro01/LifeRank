@@ -42,9 +42,9 @@ export function ProfileHeader({
   return (
     <div className="flex flex-col items-center gap-2 pb-8 text-center">
       <div className="relative mb-4">
-        <Avatar className="border-primary size-56 border-4">
+        <Avatar className="border-primary size-32 border-4 sm:size-44 lg:size-56">
           <AvatarImage src={avatarUrl ?? undefined} alt={name} />
-          <AvatarFallback className="text-5xl">
+          <AvatarFallback className="text-3xl sm:text-5xl">
             {initials(name)}
           </AvatarFallback>
         </Avatar>
@@ -55,9 +55,9 @@ export function ProfileHeader({
               <button
                 type="button"
                 aria-label="Alterar foto"
-                className="bg-primary text-primary-foreground ring-background absolute right-4 bottom-4 flex size-12 items-center justify-center rounded-full ring-4"
+                className="bg-primary text-primary-foreground ring-background absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full ring-4 sm:right-4 sm:bottom-4 sm:size-12"
               >
-                <Pencil className="size-4" />
+                <Pencil className="size-3 sm:size-4" />
               </button>
             }
           />
@@ -75,8 +75,12 @@ export function ProfileHeader({
         </Dialog>
       </div>
 
-      <h1 className="font-heading text-5xl uppercase sm:text-7xl">{name}</h1>
-      <p className="text-primary text-xl font-medium sm:text-2xl">{email}</p>
+      <h1 className="font-heading text-3xl uppercase sm:text-5xl lg:text-7xl">
+        {name}
+      </h1>
+      <p className="text-primary text-base font-medium break-all sm:text-xl lg:text-2xl">
+        {email}
+      </p>
 
       <Dialog>
         <DialogTrigger

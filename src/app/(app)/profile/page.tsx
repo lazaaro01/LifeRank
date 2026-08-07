@@ -51,14 +51,14 @@ export default async function ProfilePage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-8">
+        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 sm:p-8">
           <div className="flex items-start justify-between">
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               XP total de performance
             </p>
             <Trophy className="text-muted-foreground size-5" />
           </div>
-          <p className="text-primary text-5xl font-semibold">
+          <p className="text-primary text-4xl font-semibold sm:text-5xl">
             {profile.xp.toLocaleString("pt-BR")}
           </p>
           <div className="space-y-2">
@@ -75,11 +75,13 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <div className="bg-primary text-primary-foreground relative flex flex-col justify-between gap-6 overflow-hidden rounded-xl p-8">
+        <div className="bg-primary text-primary-foreground relative flex flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 sm:p-8">
           <p className="text-xs font-medium tracking-wide uppercase opacity-70">
             Streak atual
           </p>
-          <p className="text-5xl font-semibold">{profile.currentStreak}</p>
+          <p className="text-4xl font-semibold sm:text-5xl">
+            {profile.currentStreak}
+          </p>
           <div>
             <p className="text-sm tracking-wide uppercase">
               Dias ativos seguidos
@@ -90,14 +92,14 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-8">
+        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 sm:p-8">
           <div className="flex items-start justify-between">
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Atividades concluídas
             </p>
             <Award className="text-muted-foreground size-5" />
           </div>
-          <p className="text-5xl font-semibold">{activityCount}</p>
+          <p className="text-4xl font-semibold sm:text-5xl">{activityCount}</p>
           <div className="flex gap-2">
             {recentActivities.map((activity) => {
               const Icon = getIcon(activity.category.icon);
@@ -120,7 +122,7 @@ export default async function ProfilePage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="bg-muted rounded-xl p-8">
+        <div className="bg-muted rounded-xl p-6 sm:p-8">
           <h3 className="mb-6 text-2xl font-semibold uppercase">
             Marcos recentes
           </h3>
@@ -153,7 +155,7 @@ export default async function ProfilePage() {
           )}
         </div>
 
-        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-8">
+        <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 sm:p-8">
           <h3 className="text-primary text-2xl font-semibold uppercase">
             Badges ativos
           </h3>

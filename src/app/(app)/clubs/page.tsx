@@ -44,7 +44,7 @@ export default async function ClubsPage() {
       </div>
 
       {clubs.length === 0 ? (
-        <div className="text-muted-foreground flex flex-col items-center gap-2 rounded-2xl border border-dashed p-12 text-center">
+        <div className="text-muted-foreground flex flex-col items-center gap-2 rounded-2xl border border-dashed p-6 text-center sm:p-12">
           <Users className="size-8" />
           <p className="text-sm font-medium">
             Você ainda não faz parte de nenhum clube

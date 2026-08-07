@@ -12,11 +12,11 @@ export default function LoginPage() {
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader variant="minimal" />
-      <main className="flex flex-1 items-center justify-center px-6 py-20">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-16 md:flex-row">
-          <div className="flex flex-1 flex-col items-start gap-6">
-            <LevelUpMascot className="text-primary size-40" />
-            <h1 className="font-heading text-6xl leading-[0.95] uppercase sm:text-7xl">
+      <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-20">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-10 md:flex-row md:gap-16">
+          <div className="flex flex-1 flex-col items-start gap-4 sm:gap-6">
+            <LevelUpMascot className="text-primary size-28 sm:size-40" />
+            <h1 className="font-heading text-4xl leading-[0.95] uppercase sm:text-6xl md:text-7xl">
               Bem-vindo de
               <br />
               <span className="text-primary">volta à arena</span>
@@ -27,7 +27,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="border-border/60 flex-1 rounded-xl border bg-white p-10 sm:p-12">
+          <div className="border-border/60 w-full flex-1 rounded-xl border bg-white p-6 sm:p-10 md:p-12">
             <LoginForm />
           </div>
         </div>

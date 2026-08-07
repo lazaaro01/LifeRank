@@ -20,8 +20,8 @@ export default async function RegisterPhotoPage() {
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader variant="minimal" />
-      <main className="flex flex-1 items-center justify-center px-6 py-20">
-        <div className="border-border/60 flex w-full max-w-sm flex-col items-center gap-2 rounded-xl border bg-white p-10 text-center shadow-sm">
+      <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-20">
+        <div className="border-border/60 flex w-full max-w-sm flex-col items-center gap-2 rounded-xl border bg-white p-6 text-center shadow-sm sm:p-10">
           <h1 className="font-heading text-3xl uppercase">
             Adicione uma foto
           </h1>

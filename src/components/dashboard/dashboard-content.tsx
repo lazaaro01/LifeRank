@@ -133,10 +133,10 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
 
       <Link
         href="/activities/new"
-        className="bg-primary text-primary-foreground fixed right-8 bottom-8 flex size-16 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105"
+        className="bg-primary text-primary-foreground fixed right-4 bottom-4 flex size-14 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105 sm:right-8 sm:bottom-8 sm:size-16"
         aria-label="Registrar atividade"
       >
-        <Plus className="size-6" />
+        <Plus className="size-5 sm:size-6" />
       </Link>
     </motion.div>
   );

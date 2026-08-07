@@ -8,8 +8,8 @@ type CelebrationCardProps = {
 
 export function CelebrationCard({ currentStreak }: CelebrationCardProps) {
   return (
-    <div className="border-primary/20 mx-auto flex w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border-2 border-dashed bg-white p-10 text-center">
-      <LevelUpMascot className="text-primary size-32" />
+    <div className="border-primary/20 mx-auto flex w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border-2 border-dashed bg-white p-6 text-center sm:p-10">
+      <LevelUpMascot className="text-primary size-24 sm:size-32" />
       <h2 className="font-heading text-primary text-3xl uppercase sm:text-4xl">
         Você está arrasando!
       </h2>
