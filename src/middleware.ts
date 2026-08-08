@@ -5,6 +5,10 @@ import authConfig from "@/server/auth.config";
 const { auth } = NextAuth(authConfig);
 
 const PUBLIC_ROUTES = ["/", "/login", "/register"];
+// Only these should bounce an already-logged-in user away (no reason to see
+// the login/register forms again). "/" stays visible to everyone, logged in
+// or not, so it always shows the landing page first.
+const AUTH_ONLY_ROUTES = ["/login", "/register"];
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
@@ -15,7 +19,7 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
   }
 
-  if (isLoggedIn && isPublicRoute) {
+  if (isLoggedIn && AUTH_ONLY_ROUTES.includes(pathname)) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
   }
 
