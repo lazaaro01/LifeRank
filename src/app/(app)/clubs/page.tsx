@@ -56,7 +56,11 @@ export default async function ClubsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {clubs.map((club) => (
-            <div key={club.id} className="space-y-3 rounded-xl border p-6">
+            <Link
+              key={club.id}
+              href={`/clubs/${club.id}`}
+              className="hover:border-primary/50 space-y-3 rounded-xl border p-6 transition-colors"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-heading text-xl uppercase">{club.name}</p>
@@ -82,7 +86,7 @@ export default async function ClubsPage() {
                   </span>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

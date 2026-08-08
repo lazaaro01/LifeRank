@@ -23,9 +23,18 @@ export function RecentActivities({ activities }: RecentActivitiesProps) {
             key={activity.id}
             className="flex items-center gap-3 px-2 py-3 sm:gap-4 sm:py-4"
           >
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10">
-              <Icon className="text-primary size-4" />
-            </div>
+            {activity.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activity.photoUrl}
+                alt={activity.title}
+                className="size-9 shrink-0 rounded-full object-cover sm:size-10"
+              />
+            ) : (
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10">
+                <Icon className="text-primary size-4" />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium uppercase sm:text-sm">
                 {activity.title}

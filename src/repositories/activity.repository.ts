@@ -4,7 +4,14 @@ import type { ActivityModel } from "@/generated/prisma/models";
 
 export type CreateActivityData = Pick<
   ActivityModel,
-  "title" | "quantity" | "points" | "xpEarned" | "occurredAt" | "userId" | "categoryId"
+  | "title"
+  | "quantity"
+  | "points"
+  | "xpEarned"
+  | "occurredAt"
+  | "userId"
+  | "categoryId"
+  | "photoUrl"
 >;
 
 export const activityRepository = {
@@ -48,6 +55,15 @@ export const activityRepository = {
       include: { category: true },
       orderBy: { occurredAt: "desc" },
       take: options.take ?? 100,
+    });
+  },
+
+  listRecentByUsers(userIds: string[], limit = 12) {
+    return prisma.activity.findMany({
+      where: { userId: { in: userIds }, photoUrl: { not: null } },
+      include: { category: true, user: true },
+      orderBy: { occurredAt: "desc" },
+      take: limit,
     });
   },
 };

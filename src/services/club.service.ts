@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { clubRepository, clubMembershipRepository } from "@/repositories/club.repository";
+import { activityRepository } from "@/repositories/activity.repository";
 import { ServiceError } from "@/services/errors";
 import type { CreateClubInput, JoinClubInput } from "@/utils/validators/club.schema";
 import type { ClubModel } from "@/generated/prisma/models";
@@ -82,5 +83,39 @@ export const clubService = {
       user: membership.user,
       role: membership.role,
     }));
+  },
+
+  async getClubFeed(clubId: string, limit = 12) {
+    const memberIds = await clubMembershipRepository.listMemberIds(clubId);
+    if (memberIds.length === 0) return [];
+    return activityRepository.listRecentByUsers(memberIds, limit);
+  },
+
+  getClubDetails(clubId: string) {
+    return clubRepository.findByIdWithMemberCount(clubId);
+  },
+
+  async leaveClub(userId: string, clubId: string) {
+    const membership = await clubMembershipRepository.findMembership(clubId, userId);
+    if (!membership) {
+      throw new ServiceError("Você não faz parte deste clube");
+    }
+    if (membership.role === "OWNER") {
+      throw new ServiceError(
+        "O dono não pode sair do clube. Exclua o clube se quiser encerrá-lo."
+      );
+    }
+    await clubMembershipRepository.remove(clubId, userId);
+  },
+
+  async deleteClub(userId: string, clubId: string) {
+    const club = await clubRepository.findByIdWithMemberCount(clubId);
+    if (!club) {
+      throw new ServiceError("Clube não encontrado");
+    }
+    if (club.ownerId !== userId) {
+      throw new ServiceError("Só o dono pode excluir o clube");
+    }
+    await clubRepository.delete(clubId);
   },
 };

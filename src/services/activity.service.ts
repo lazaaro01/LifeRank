@@ -19,7 +19,8 @@ export type CreateActivityResult = {
 export const activityService = {
   async createActivity(
     userId: string,
-    input: CreateActivityInput
+    input: CreateActivityInput,
+    photoUrl: string
   ): Promise<CreateActivityResult> {
     const category = await categoryRepository.findById(input.categoryId);
 
@@ -40,6 +41,7 @@ export const activityService = {
           points,
           xpEarned,
           occurredAt: new Date(input.occurredAt),
+          photoUrl,
         },
         tx
       );

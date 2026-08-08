@@ -149,9 +149,18 @@ export function ActivityHistoryContent({
                   key={activity.id}
                   className="flex items-center gap-4 rounded-xl border p-4 sm:p-6"
                 >
-                  <div className="bg-primary/10 flex size-12 shrink-0 items-center justify-center rounded-full sm:size-14">
-                    <Icon className="text-primary size-5" />
-                  </div>
+                  {activity.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={activity.photoUrl}
+                      alt={activity.title}
+                      className="size-12 shrink-0 rounded-full object-cover sm:size-14"
+                    />
+                  ) : (
+                    <div className="bg-primary/10 flex size-12 shrink-0 items-center justify-center rounded-full sm:size-14">
+                      <Icon className="text-primary size-5" />
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium uppercase sm:text-base">
                       {activity.title}

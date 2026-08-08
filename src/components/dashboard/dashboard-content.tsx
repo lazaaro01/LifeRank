@@ -10,9 +10,10 @@ import { StreakCard } from "@/components/dashboard/streak-card";
 import { RecentActivities } from "@/components/dashboard/recent-activities";
 import { AchievementsGrid } from "@/components/dashboard/achievements-grid";
 import { MiniLeaderboardCard } from "@/components/dashboard/mini-leaderboard-card";
+import { ClubFeed } from "@/components/dashboard/club-feed";
 import { CelebrationCard } from "@/components/dashboard/celebration-card";
 import type { DashboardData } from "@/services/dashboard.service";
-import type { UserModel } from "@/generated/prisma/models";
+import type { ActivityModel, CategoryModel, UserModel } from "@/generated/prisma/models";
 
 const EvolutionChart = dynamic(
   () =>
@@ -40,6 +41,7 @@ type DashboardContentProps = {
   club: {
     name: string;
     ranking: { rank: number; user: UserModel }[];
+    feed: (ActivityModel & { category: CategoryModel; user: UserModel })[];
   } | null;
 };
 
@@ -138,6 +140,10 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
           </div>
         </div>
       </div>
+
+      <motion.div variants={item}>
+        <ClubFeed clubName={club?.name ?? null} activities={club?.feed ?? []} />
+      </motion.div>
 
       <motion.div variants={item}>
         <CelebrationCard currentStreak={user.currentStreak} />

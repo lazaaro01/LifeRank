@@ -18,14 +18,21 @@ export default async function DashboardPage() {
   ]);
 
   const primaryClub = myClubs[0] ?? null;
-  const clubRanking = primaryClub
-    ? await clubService.getClubRanking(primaryClub.id)
-    : [];
+  const [clubRanking, clubFeed] = primaryClub
+    ? await Promise.all([
+        clubService.getClubRanking(primaryClub.id),
+        clubService.getClubFeed(primaryClub.id),
+      ])
+    : [[], []];
 
   return (
     <DashboardContent
       data={data}
-      club={primaryClub ? { name: primaryClub.name, ranking: clubRanking } : null}
+      club={
+        primaryClub
+          ? { name: primaryClub.name, ranking: clubRanking, feed: clubFeed }
+          : null
+      }
     />
   );
 }

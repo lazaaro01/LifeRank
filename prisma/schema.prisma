@@ -60,11 +60,12 @@ model Category {
 }
 
 model Activity {
-  id       String @id @default(uuid())
+  id       String  @id @default(uuid())
   title    String
   quantity Float
   points   Int
   xpEarned Int
+  photoUrl String?
 
   occurredAt DateTime
   createdAt  DateTime @default(now())

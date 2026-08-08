@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/server/auth";
 import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { AvatarUploadForm } from "@/components/auth/avatar-upload-form";
 
 export const metadata: Metadata = {
@@ -31,7 +30,6 @@ export default async function RegisterPhotoPage() {
           <AvatarUploadForm name={name} />
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

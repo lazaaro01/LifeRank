@@ -63,3 +63,41 @@ export async function joinClubAction(
     return { success: false, error: "Não foi possível entrar no clube" };
   }
 }
+
+type SimpleActionResult = { success: true } | { success: false; error: string };
+
+export async function leaveClubAction(clubId: string): Promise<SimpleActionResult> {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  try {
+    await clubService.leaveClub(session.user.id, clubId);
+    revalidatePath("/clubs");
+    return { success: true };
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Não foi possível sair do clube" };
+  }
+}
+
+export async function deleteClubAction(clubId: string): Promise<SimpleActionResult> {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  try {
+    await clubService.deleteClub(session.user.id, clubId);
+    revalidatePath("/clubs");
+    return { success: true };
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Não foi possível excluir o clube" };
+  }
+}

@@ -36,6 +36,10 @@ export const clubRepository = {
       .findUnique({ where: { inviteCode }, select: { id: true } })
       .then((club) => club !== null);
   },
+
+  delete(id: string) {
+    return prisma.club.delete({ where: { id } });
+  },
 };
 
 export const clubMembershipRepository = {
@@ -62,6 +66,18 @@ export const clubMembershipRepository = {
       where: { clubId },
       include: { user: true },
       orderBy: { user: { xp: "desc" } },
+    });
+  },
+
+  listMemberIds(clubId: string) {
+    return prisma.clubMembership
+      .findMany({ where: { clubId }, select: { userId: true } })
+      .then((rows) => rows.map((row) => row.userId));
+  },
+
+  remove(clubId: string, userId: string) {
+    return prisma.clubMembership.delete({
+      where: { clubId_userId: { clubId, userId } },
     });
   },
 };

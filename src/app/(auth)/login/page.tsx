@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { LoginForm } from "@/components/auth/login-form";
 import { LevelUpMascot } from "@/components/landing/level-up-mascot";
 
@@ -32,7 +31,6 @@ export default function LoginPage() {
           </div>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

@@ -10,7 +10,7 @@ A interface segue uma identidade visual premium/esportiva (tipografia condensada
 - **Dashboard** — nível e XP em destaque, streak atual, badges desbloqueados, gráfico de evolução de pontos, atividades recentes e mini ranking do clube.
 - **Atividades** — registro de atividades por categoria (com pontuação e XP configuráveis por categoria) e histórico completo com filtros.
 - **Gamificação** — pontos, XP, níveis, streaks (atual e melhor) e conquistas desbloqueadas automaticamente por marcos (primeira atividade, pontos acumulados, dias seguidos, etc.).
-- **Clubes** — criação de clubes (públicos ou privados) com código de convite único, entrada via código e ranking por clube.
+- **Clubes** — criação de clubes (públicos ou privados) com código de convite único, entrada via código, página de detalhe com ranking do clube e feed de fotos dos membros. Participantes podem sair do clube a qualquer momento; o dono não pode sair — só tem a opção de excluir o clube permanentemente (o que remove todos os membros).
 - **Ranking global** — classificação geral de todos os usuários por XP, com pódio para o top 3.
 - **Perfil** — estatísticas do usuário, edição de dados e troca de foto.
 

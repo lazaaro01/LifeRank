@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/utils/validators/activity.schema";
 import { createActivityAction } from "@/server/actions/activity.actions";
 import { getIcon } from "@/lib/icon-map";
+import { CameraCapture } from "@/components/activities/camera-capture";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +30,9 @@ export function LogActivityForm({ categories }: LogActivityFormProps) {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   const {
     register,
@@ -48,12 +53,39 @@ export function LogActivityForm({ categories }: LogActivityFormProps) {
   const selectedCategoryId = watch("categoryId");
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
 
+  const handleCapture = (file: File) => {
+    setPhotoError(null);
+    setPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const clearPhoto = () => {
+    setPhoto(null);
+    setPhotoPreview(null);
+  };
+
   const onSubmit = (data: CreateActivityInput) => {
     setFormError(null);
+
+    if (!photo) {
+      setPhotoError("Tire uma foto para comprovar a atividade");
+      return;
+    }
+    setPhotoError(null);
+
     startTransition(async () => {
-      const result = await createActivityAction(data);
+      const formData = new FormData();
+      formData.set("categoryId", data.categoryId);
+      formData.set("title", data.title);
+      formData.set("quantity", String(data.quantity));
+      formData.set("occurredAt", data.occurredAt);
+      formData.set("photo", photo);
+
+      const result = await createActivityAction(formData);
       if (!result.success) {
-        if (result.field) {
+        if (result.field === "photo") {
+          setPhotoError(result.error);
+        } else if (result.field) {
           setError(result.field as keyof CreateActivityInput, {
             message: result.error,
           });
@@ -88,6 +120,33 @@ export function LogActivityForm({ categories }: LogActivityFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
+      <div className="space-y-2">
+        <Label className="text-muted-foreground text-xs uppercase">
+          Foto de comprovação
+        </Label>
+        {photoPreview ? (
+          <div className="relative overflow-hidden rounded-xl border">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoPreview}
+              alt="Prévia da foto da atividade"
+              className="h-56 w-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={clearPhoto}
+              aria-label="Remover foto"
+              className="bg-foreground/70 text-background absolute top-3 right-3 flex size-8 items-center justify-center rounded-full"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <CameraCapture onCapture={handleCapture} />
+        )}
+        {photoError && <p className="text-destructive text-sm">{photoError}</p>}
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="title" className="text-muted-foreground text-xs uppercase">
           Nome da atividade

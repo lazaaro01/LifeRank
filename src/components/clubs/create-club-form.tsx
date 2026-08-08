@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Check, Copy, Dumbbell, Briefcase, BookOpen } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -97,7 +98,7 @@ export function CreateClubForm() {
           Compartilhe esse código com seu esquadrão para começar a dominar o
           ranking.
         </p>
-        <Button render={<a href="/clubs" />} className="mt-2 rounded-full px-8">
+        <Button render={<Link href="/clubs" />} className="mt-2 rounded-full px-8">
           Ver meus clubes
         </Button>
       </div>
