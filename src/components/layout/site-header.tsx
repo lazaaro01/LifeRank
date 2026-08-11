@@ -20,6 +20,7 @@ const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/ranking", label: "Ranking" },
   { href: "/activities", label: "Histórico" },
+  { href: "/calendar", label: "Calendário" },
   { href: "/clubs", label: "Clubes" },
 ];
 

@@ -66,4 +66,12 @@ export const activityRepository = {
       take: limit,
     });
   },
+
+  listByUsersInRange(userIds: string[], start: Date, end: Date) {
+    return prisma.activity.findMany({
+      where: { userId: { in: userIds }, occurredAt: { gte: start, lte: end } },
+      include: { user: true },
+      orderBy: { occurredAt: "asc" },
+    });
+  },
 };

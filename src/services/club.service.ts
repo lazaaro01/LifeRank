@@ -118,4 +118,10 @@ export const clubService = {
     }
     await clubRepository.delete(clubId);
   },
+
+  async getClubCalendar(clubId: string, start: Date, end: Date) {
+    const memberIds = await clubMembershipRepository.listMemberIds(clubId);
+    if (memberIds.length === 0) return [];
+    return activityRepository.listByUsersInRange(memberIds, start, end);
+  },
 };
