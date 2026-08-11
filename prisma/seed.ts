@@ -13,6 +13,8 @@ const DEFAULT_CATEGORIES = [
   { name: "Igreja", icon: "Church", pointsPerUnit: 10, unit: "atividade" },
   { name: "Trabalho", icon: "Briefcase", pointsPerUnit: 10, unit: "atividade" },
   { name: "Projeto pessoal", icon: "Rocket", pointsPerUnit: 10, unit: "atividade" },
+  { name: "Corrida", icon: "Footprints", pointsPerUnit: 10, unit: "km" },
+  { name: "Jiu-Jitsu", icon: "Swords", pointsPerUnit: 10, unit: "atividade" },
 ] as const;
 
 const ACHIEVEMENTS = [
