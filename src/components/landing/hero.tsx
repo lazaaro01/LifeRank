@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { LevelUpMascot } from "@/components/landing/level-up-mascot";
 
 export function Hero() {
   return (
@@ -83,7 +83,14 @@ export function Hero() {
         className="relative flex flex-1 items-center justify-center"
       >
         <div className="border-border/60 relative rounded-2xl border bg-white p-10 shadow-xl">
-          <LevelUpMascot className="text-primary size-56 sm:size-64" />
+          <Image
+            src="/mascote.png"
+            alt="Mascote LifeRank"
+            width={1024}
+            height={1024}
+            priority
+            className="size-56 object-contain sm:size-64"
+          />
         </div>
         <motion.div
           initial={{ opacity: 0, y: -8, rotate: 6 }}

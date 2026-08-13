@@ -27,5 +27,8 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  // Skip API routes, Next.js internals, and any request for a file with an
+  // extension (images, manifest, icons, etc. served from /public) — those
+  // were getting redirected to /login by this middleware otherwise.
+  matcher: ["/((?!api|_next/static|_next/image|.*\\..*|favicon.ico).*)"],
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,11 +40,16 @@ export function SiteHeader({ variant = "full", user }: SiteHeaderProps) {
   return (
     <header className="bg-background sticky top-0 z-40 border-b">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
-        <Link
-          href={user ? "/dashboard" : "/"}
-          className="font-heading text-primary text-3xl tracking-tight uppercase sm:text-4xl"
-        >
-          LifeRank
+        <Link href={user ? "/dashboard" : "/"} className="flex shrink-0 items-center">
+          <Image
+            src="/liferank_logo.png"
+            alt="LifeRank"
+            width={1024
+            }
+            height={1024}
+            priority
+            className="h-20 w-auto object-contain sm:h-24"
+          />
         </Link>
 
         {variant === "full" && (

@@ -50,6 +50,7 @@ next-env.d.ts
 # internal planning docs
 /DESIGN.md
 /PRD.md
+/MOBILE.md
 
 # AI agent instructions (local-only)
 /CLAUDE.md
