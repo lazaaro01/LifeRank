@@ -36,6 +36,7 @@ model User {
   achievements      UserAchievement[]
   ownedClubs        Club[]
   clubMemberships   ClubMembership[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -145,4 +146,19 @@ model ClubMembership {
 
   @@unique([clubId, userId])
   @@map("club_memberships")
+}
+
+model PushSubscription {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+
+  @@map("push_subscriptions")
 }

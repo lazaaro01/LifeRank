@@ -12,6 +12,7 @@ import { AchievementsGrid } from "@/components/dashboard/achievements-grid";
 import { MiniLeaderboardCard } from "@/components/dashboard/mini-leaderboard-card";
 import { ClubFeed } from "@/components/dashboard/club-feed";
 import { CelebrationCard } from "@/components/dashboard/celebration-card";
+import { IosInstallBanner } from "@/components/dashboard/ios-install-banner";
 import type { DashboardData } from "@/services/dashboard.service";
 import type { ActivityModel, CategoryModel, UserModel } from "@/generated/prisma/models";
 
@@ -62,6 +63,10 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
       animate="show"
       className="space-y-3 pb-24 sm:space-y-4"
     >
+      <motion.div variants={item}>
+        <IosInstallBanner />
+      </motion.div>
+
       <motion.div variants={item}>
         <LevelHero
           level={levelProgress.level}

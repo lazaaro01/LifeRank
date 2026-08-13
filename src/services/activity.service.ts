@@ -7,6 +7,7 @@ import { xpFromPoints } from "@/services/gamification/xp";
 import { getLevelFromXp } from "@/services/gamification/leveling";
 import { computeStreak } from "@/services/gamification/streak";
 import { evaluateAchievements } from "@/services/gamification/achievements";
+import { notificationService } from "@/services/notification.service";
 import { ServiceError } from "@/services/errors";
 import type { CreateActivityInput } from "@/utils/validators/activity.schema";
 import type { AchievementModel } from "@/generated/prisma/models";
@@ -30,8 +31,9 @@ export const activityService = {
 
     const points = Math.round(category.pointsPerUnit * input.quantity);
     const xpEarned = xpFromPoints(points);
+    let actorName = "";
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await activityRepository.create(
         {
           userId,
@@ -50,6 +52,7 @@ export const activityService = {
       if (!currentUser) {
         throw new ServiceError("Usuário não encontrado");
       }
+      actorName = currentUser.name;
 
       const newTotalPoints = currentUser.points + points;
       const newTotalXp = currentUser.xp + xpEarned;
@@ -96,5 +99,14 @@ export const activityService = {
 
       return { leveledUp, newAchievements };
     });
+
+    try {
+      await notificationService.notifyClubmatesOfActivity(userId, actorName, xpEarned);
+    } catch (error) {
+      // Notificar o clube nunca deve derrubar o registro da atividade.
+      console.error("[activityService] Falha ao notificar o clube:", error);
+    }
+
+    return result;
   },
 };

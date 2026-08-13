@@ -7,6 +7,7 @@ import { achievementRepository } from "@/repositories/achievement.repository";
 import { getLevelProgress } from "@/services/gamification/leveling";
 import { getIcon } from "@/lib/icon-map";
 import { ProfileHeader } from "@/components/profile/profile-header";
+import { NotificationToggle } from "@/components/profile/notification-toggle";
 
 export const metadata: Metadata = {
   title: "Perfil | LifeRank",
@@ -49,6 +50,8 @@ export default async function ProfilePage() {
           bio: profile.bio ?? "",
         }}
       />
+
+      <NotificationToggle />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 sm:p-8">
