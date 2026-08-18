@@ -8,7 +8,12 @@ export const metadata: Metadata = {
   title: "Dashboard | LifeRank",
 };
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: Promise<{ club?: string }>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const { club: clubIdParam } = await searchParams;
   const session = await auth();
   const userId = session!.user.id;
 
@@ -17,20 +22,24 @@ export default async function DashboardPage() {
     clubService.listMyClubs(userId),
   ]);
 
-  const primaryClub = myClubs[0] ?? null;
-  const [clubRanking, clubFeed] = primaryClub
+  const selectedClub =
+    myClubs.find((club) => club.id === clubIdParam) ?? myClubs[0] ?? null;
+
+  const [clubRanking, clubFeed] = selectedClub
     ? await Promise.all([
-        clubService.getClubRanking(primaryClub.id),
-        clubService.getClubFeed(primaryClub.id),
+        clubService.getClubRanking(selectedClub.id),
+        clubService.getClubFeed(selectedClub.id, userId),
       ])
     : [[], []];
 
   return (
     <DashboardContent
       data={data}
+      myClubs={myClubs.map((club) => ({ id: club.id, name: club.name }))}
+      selectedClubId={selectedClub?.id ?? null}
       club={
-        primaryClub
-          ? { name: primaryClub.name, ranking: clubRanking, feed: clubFeed }
+        selectedClub
+          ? { name: selectedClub.name, ranking: clubRanking, feed: clubFeed }
           : null
       }
     />

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ClubSelector } from "@/components/clubs/club-selector";
 import type { ActivityModel, UserModel } from "@/generated/prisma/models";
 
 type FeedActivity = ActivityModel & { user: UserModel };
@@ -10,6 +11,8 @@ type CalendarContentProps = {
   activities: FeedActivity[];
   year: number;
   month: number; // 0-indexed
+  myClubs: { id: string; name: string }[];
+  selectedClubId: string | null;
 };
 
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
@@ -73,6 +76,8 @@ export function CalendarContent({
   activities,
   year,
   month,
+  myClubs,
+  selectedClubId,
 }: CalendarContentProps) {
   const today = new Date();
   const isCurrentMonth =
@@ -83,6 +88,8 @@ export function CalendarContent({
   const prevYear = month === 0 ? year - 1 : year;
   const nextMonth = month === 11 ? 0 : month + 1;
   const nextYear = month === 11 ? year + 1 : year;
+
+  const clubQuery = selectedClubId ? `&club=${selectedClubId}` : "";
 
   const cells = buildMonthGrid(year, month);
   const byDay = groupByDay(activities);
@@ -104,7 +111,7 @@ export function CalendarContent({
         {clubName && (
           <div className="flex items-center gap-3">
             <Link
-              href={`/calendar?y=${prevYear}&m=${prevMonth + 1}`}
+              href={`/calendar?y=${prevYear}&m=${prevMonth + 1}${clubQuery}`}
               aria-label="Mês anterior"
               className="border-border flex size-9 items-center justify-center rounded-full border"
             >
@@ -114,7 +121,7 @@ export function CalendarContent({
               {MONTH_LABELS[month]} {year}
             </span>
             <Link
-              href={`/calendar?y=${nextYear}&m=${nextMonth + 1}`}
+              href={`/calendar?y=${nextYear}&m=${nextMonth + 1}${clubQuery}`}
               aria-label="Próximo mês"
               className="border-border flex size-9 items-center justify-center rounded-full border"
             >
@@ -123,6 +130,12 @@ export function CalendarContent({
           </div>
         )}
       </div>
+
+      <ClubSelector
+        clubs={myClubs}
+        selectedClubId={selectedClubId}
+        buildHref={(clubId) => `/calendar?y=${year}&m=${month + 1}&club=${clubId}`}
+      />
 
       {!clubName ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-8 text-center sm:p-12">

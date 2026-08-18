@@ -13,6 +13,7 @@ import { MiniLeaderboardCard } from "@/components/dashboard/mini-leaderboard-car
 import { ClubFeed } from "@/components/dashboard/club-feed";
 import { CelebrationCard } from "@/components/dashboard/celebration-card";
 import { IosInstallBanner } from "@/components/dashboard/ios-install-banner";
+import { ClubSelector } from "@/components/clubs/club-selector";
 import type { DashboardData } from "@/services/dashboard.service";
 import type { ActivityModel, CategoryModel, UserModel } from "@/generated/prisma/models";
 
@@ -39,6 +40,8 @@ const item: Variants = {
 
 type DashboardContentProps = {
   data: DashboardData;
+  myClubs: { id: string; name: string }[];
+  selectedClubId: string | null;
   club: {
     name: string;
     ranking: { rank: number; user: UserModel }[];
@@ -46,7 +49,12 @@ type DashboardContentProps = {
   } | null;
 };
 
-export function DashboardContent({ data, club }: DashboardContentProps) {
+export function DashboardContent({
+  data,
+  myClubs,
+  selectedClubId,
+  club,
+}: DashboardContentProps) {
   const {
     user,
     levelProgress,
@@ -74,6 +82,14 @@ export function DashboardContent({ data, club }: DashboardContentProps) {
           xpForNextLevel={levelProgress.xpForNextLevel}
           progress={levelProgress.progress}
           points={user.points}
+        />
+      </motion.div>
+
+      <motion.div variants={item}>
+        <ClubSelector
+          clubs={myClubs}
+          selectedClubId={selectedClubId}
+          buildHref={(clubId) => `/dashboard?club=${clubId}`}
         />
       </motion.div>
 

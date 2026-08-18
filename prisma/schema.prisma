@@ -37,6 +37,7 @@ model User {
   ownedClubs        Club[]
   clubMemberships   ClubMembership[]
   pushSubscriptions PushSubscription[]
+  activityViews     ActivityView[]
 
   @@map("users")
 }
@@ -76,6 +77,8 @@ model Activity {
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  views ActivityView[]
 
   @@map("activities")
 }
@@ -161,4 +164,22 @@ model PushSubscription {
   createdAt DateTime @default(now())
 
   @@map("push_subscriptions")
+}
+
+// Tracks the first time each user saw each activity in the club feed, so the
+// photo can disappear from that user's feed a fixed time after THEY first
+// saw it (not a global expiry from when it was posted).
+model ActivityView {
+  id String @id @default(uuid())
+
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstViewedAt DateTime @default(now())
+
+  @@unique([activityId, userId])
+  @@map("activity_views")
 }

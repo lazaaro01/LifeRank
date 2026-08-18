@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { clubRepository, clubMembershipRepository } from "@/repositories/club.repository";
 import { activityRepository } from "@/repositories/activity.repository";
+import { activityViewRepository } from "@/repositories/activity-view.repository";
 import { ServiceError } from "@/services/errors";
 import type { CreateClubInput, JoinClubInput } from "@/utils/validators/club.schema";
 import type { ClubModel } from "@/generated/prisma/models";
+
+// Each member has their own 3-minute window that starts the first time THEY
+// see a given photo — not a single deadline shared by the whole club.
+const FEED_VISIBILITY_MS = 4 * 60 * 1000;
 
 const INVITE_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -85,10 +90,35 @@ export const clubService = {
     }));
   },
 
-  async getClubFeed(clubId: string, limit = 12) {
+  async getClubFeed(clubId: string, viewerId: string, limit = 5) {
     const memberIds = await clubMembershipRepository.listMemberIds(clubId);
     if (memberIds.length === 0) return [];
-    return activityRepository.listRecentByUsers(memberIds, limit);
+
+    const activities = await activityRepository.listRecentByUsers(memberIds, limit);
+    if (activities.length === 0) return [];
+
+    const activityIds = activities.map((activity) => activity.id);
+    const views = await activityViewRepository.listByUserForActivities(
+      viewerId,
+      activityIds
+    );
+    const viewedAt = new Map(
+      views.map((view) => [view.activityId, view.firstViewedAt])
+    );
+
+    const now = Date.now();
+    const visible = activities.filter((activity) => {
+      const firstViewedAt = viewedAt.get(activity.id);
+      if (!firstViewedAt) return true; // never seen by this viewer yet — their clock hasn't started
+      return now - firstViewedAt.getTime() < FEED_VISIBILITY_MS;
+    });
+
+    const newlySeenIds = activities
+      .filter((activity) => !viewedAt.has(activity.id))
+      .map((activity) => activity.id);
+    await activityViewRepository.recordFirstViews(viewerId, newlySeenIds);
+
+    return visible;
   },
 
   getClubDetails(clubId: string) {

@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 };
 
 type CalendarPageProps = {
-  searchParams: Promise<{ y?: string; m?: string }>;
+  searchParams: Promise<{ y?: string; m?: string; club?: string }>;
 };
 
 export default async function CalendarPage({ searchParams }: CalendarPageProps) {
-  const { y, m } = await searchParams;
+  const { y, m, club: clubIdParam } = await searchParams;
   const session = await auth();
   const userId = session!.user.id;
 
@@ -24,18 +24,21 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   const monthEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
 
   const myClubs = await clubService.listMyClubs(userId);
-  const primaryClub = myClubs[0] ?? null;
+  const selectedClub =
+    myClubs.find((club) => club.id === clubIdParam) ?? myClubs[0] ?? null;
 
-  const activities = primaryClub
-    ? await clubService.getClubCalendar(primaryClub.id, monthStart, monthEnd)
+  const activities = selectedClub
+    ? await clubService.getClubCalendar(selectedClub.id, monthStart, monthEnd)
     : [];
 
   return (
     <CalendarContent
-      clubName={primaryClub?.name ?? null}
+      clubName={selectedClub?.name ?? null}
       activities={activities}
       year={year}
       month={month}
+      myClubs={myClubs.map((club) => ({ id: club.id, name: club.name }))}
+      selectedClubId={selectedClub?.id ?? null}
     />
   );
 }
