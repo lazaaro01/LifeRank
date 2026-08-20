@@ -101,3 +101,30 @@ export async function deleteClubAction(clubId: string): Promise<SimpleActionResu
     return { success: false, error: "Não foi possível excluir o clube" };
   }
 }
+
+export async function toggleActivityReactionAction(
+  clubId: string,
+  activityId: string,
+  emoji: string
+): Promise<SimpleActionResult> {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  try {
+    await clubService.toggleActivityReaction(
+      session.user.id,
+      clubId,
+      activityId,
+      emoji
+    );
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Não foi possível reagir à atividade" };
+  }
+}

@@ -83,3 +83,63 @@ export async function createActivityAction(
     return { success: false, error: "Não foi possível registrar a atividade" };
   }
 }
+
+export async function updateActivityAction(
+  activityId: string,
+  input: unknown
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  const parsed = createActivitySchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: "Dados inválidos" };
+  }
+
+  try {
+    const result = await activityService.updateActivity(
+      session.user.id,
+      activityId,
+      parsed.data
+    );
+    revalidatePath("/dashboard");
+    revalidatePath("/activities");
+    return {
+      success: true,
+      leveledUp: result.leveledUp,
+      newAchievements: result.newAchievements.map((achievement) => ({
+        title: achievement.title,
+      })),
+    };
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return { success: false, error: error.message, field: error.field };
+    }
+    return { success: false, error: "Não foi possível atualizar a atividade" };
+  }
+}
+
+type SimpleActionResult = { success: true } | { success: false; error: string };
+
+export async function deleteActivityAction(
+  activityId: string
+): Promise<SimpleActionResult> {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  try {
+    await activityService.deleteActivity(session.user.id, activityId);
+    revalidatePath("/dashboard");
+    revalidatePath("/activities");
+    return { success: true };
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Não foi possível excluir a atividade" };
+  }
+}

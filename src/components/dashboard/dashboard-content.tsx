@@ -43,9 +43,14 @@ type DashboardContentProps = {
   myClubs: { id: string; name: string }[];
   selectedClubId: string | null;
   club: {
+    id: string;
     name: string;
     ranking: { rank: number; user: UserModel }[];
-    feed: (ActivityModel & { category: CategoryModel; user: UserModel })[];
+    feed: (ActivityModel & {
+      category: CategoryModel;
+      user: UserModel;
+      reactions: { emoji: string; count: number; reactedByMe: boolean }[];
+    })[];
   } | null;
 };
 
@@ -163,7 +168,11 @@ export function DashboardContent({
       </div>
 
       <motion.div variants={item}>
-        <ClubFeed clubName={club?.name ?? null} activities={club?.feed ?? []} />
+        <ClubFeed
+          clubId={club?.id ?? null}
+          clubName={club?.name ?? null}
+          activities={club?.feed ?? []}
+        />
       </motion.div>
 
       <motion.div variants={item}>

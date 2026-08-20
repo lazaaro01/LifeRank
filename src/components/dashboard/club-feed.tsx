@@ -1,12 +1,24 @@
+"use client";
+
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Camera } from "lucide-react";
 import { getIcon } from "@/lib/icon-map";
+import { toggleActivityReactionAction } from "@/server/actions/club.actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ActivityModel, CategoryModel, UserModel } from "@/generated/prisma/models";
 
-type FeedActivity = ActivityModel & { category: CategoryModel; user: UserModel };
+type ReactionSummary = { emoji: string; count: number; reactedByMe: boolean };
+
+type FeedActivity = ActivityModel & {
+  category: CategoryModel;
+  user: UserModel;
+  reactions: ReactionSummary[];
+};
 
 type ClubFeedProps = {
+  clubId: string | null;
   clubName: string | null;
   activities: FeedActivity[];
 };
@@ -29,7 +41,10 @@ function timeAgo(date: Date) {
   return `há ${diffDays}d`;
 }
 
-export function ClubFeed({ clubName, activities }: ClubFeedProps) {
+export function ClubFeed({ clubId, clubName, activities }: ClubFeedProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   if (!clubName) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-8 text-center sm:p-12">
@@ -43,6 +58,14 @@ export function ClubFeed({ clubName, activities }: ClubFeedProps) {
       </div>
     );
   }
+
+  const handleReact = (activityId: string, emoji: string) => {
+    if (!clubId || isPending) return;
+    startTransition(async () => {
+      await toggleActivityReactionAction(clubId, activityId, emoji);
+      router.refresh();
+    });
+  };
 
   return (
     <div className="rounded-xl border bg-white p-4 sm:p-8">
@@ -95,6 +118,28 @@ export function ClubFeed({ clubName, activities }: ClubFeedProps) {
                   <div className="text-muted-foreground flex items-center gap-1 text-[10px] uppercase">
                     <Icon className="size-3" />
                     {timeAgo(activity.occurredAt)}
+                  </div>
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {activity.reactions.map((reaction) => (
+                      <button
+                        key={reaction.emoji}
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleReact(activity.id, reaction.emoji)}
+                        className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] transition-colors ${
+                          reaction.reactedByMe
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:bg-muted"
+                        }`}
+                      >
+                        <span>{reaction.emoji}</span>
+                        {reaction.count > 0 && (
+                          <span className="text-muted-foreground">
+                            {reaction.count}
+                          </span>
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>

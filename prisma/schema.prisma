@@ -38,6 +38,7 @@ model User {
   clubMemberships   ClubMembership[]
   pushSubscriptions PushSubscription[]
   activityViews     ActivityView[]
+  activityReactions ActivityReaction[]
 
   @@map("users")
 }
@@ -78,7 +79,8 @@ model Activity {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  views ActivityView[]
+  views     ActivityView[]
+  reactions ActivityReaction[]
 
   @@map("activities")
 }
@@ -182,4 +184,24 @@ model ActivityView {
 
   @@unique([activityId, userId])
   @@map("activity_views")
+}
+
+// A member reacts to a clubmate's activity photo with one of a fixed set of
+// emoji. One reaction per (activity, user, emoji) — clicking the same emoji
+// again removes it.
+model ActivityReaction {
+  id String @id @default(uuid())
+
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  emoji String
+
+  createdAt DateTime @default(now())
+
+  @@unique([activityId, userId, emoji])
+  @@map("activity_reactions")
 }

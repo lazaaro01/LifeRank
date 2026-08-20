@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getIcon } from "@/lib/icon-map";
 import { Card, CardContent } from "@/components/ui/card";
+import { ActivityRowActions } from "@/components/activities/activity-row-actions";
 import type { ActivityModel, CategoryModel } from "@/generated/prisma/models";
 
 type ActivityWithCategory = ActivityModel & { category: CategoryModel };
@@ -176,6 +177,10 @@ export function ActivityHistoryContent({
                   <span className="text-primary shrink-0 text-lg font-semibold sm:text-xl">
                     +{activity.xpEarned} XP
                   </span>
+                  <ActivityRowActions
+                    activityId={activity.id}
+                    activityTitle={activity.title}
+                  />
                 </div>
               );
             })}

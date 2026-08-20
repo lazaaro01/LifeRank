@@ -39,7 +39,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       selectedClubId={selectedClub?.id ?? null}
       club={
         selectedClub
-          ? { name: selectedClub.name, ranking: clubRanking, feed: clubFeed }
+          ? {
+              id: selectedClub.id,
+              name: selectedClub.name,
+              ranking: clubRanking,
+              feed: clubFeed,
+            }
           : null
       }
     />

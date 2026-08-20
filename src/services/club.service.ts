@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { clubRepository, clubMembershipRepository } from "@/repositories/club.repository";
 import { activityRepository } from "@/repositories/activity.repository";
 import { activityViewRepository } from "@/repositories/activity-view.repository";
+import { activityReactionRepository } from "@/repositories/activity-reaction.repository";
 import { ServiceError } from "@/services/errors";
 import type { CreateClubInput, JoinClubInput } from "@/utils/validators/club.schema";
 import type { ClubModel } from "@/generated/prisma/models";
@@ -9,6 +10,13 @@ import type { ClubModel } from "@/generated/prisma/models";
 // Each member has their own 3-minute window that starts the first time THEY
 // see a given photo — not a single deadline shared by the whole club.
 const FEED_VISIBILITY_MS = 4 * 60 * 1000;
+
+export const REACTION_EMOJIS = ["🔥", "💪", "👏", "🎉"] as const;
+export type ReactionEmoji = (typeof REACTION_EMOJIS)[number];
+
+function isReactionEmoji(value: string): value is ReactionEmoji {
+  return (REACTION_EMOJIS as readonly string[]).includes(value);
+}
 
 const INVITE_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -98,10 +106,10 @@ export const clubService = {
     if (activities.length === 0) return [];
 
     const activityIds = activities.map((activity) => activity.id);
-    const views = await activityViewRepository.listByUserForActivities(
-      viewerId,
-      activityIds
-    );
+    const [views, reactions] = await Promise.all([
+      activityViewRepository.listByUserForActivities(viewerId, activityIds),
+      activityReactionRepository.listForActivities(activityIds),
+    ]);
     const viewedAt = new Map(
       views.map((view) => [view.activityId, view.firstViewedAt])
     );
@@ -118,7 +126,54 @@ export const clubService = {
       .map((activity) => activity.id);
     await activityViewRepository.recordFirstViews(viewerId, newlySeenIds);
 
-    return visible;
+    const reactionsByActivity = new Map<string, typeof reactions>();
+    for (const reaction of reactions) {
+      const list = reactionsByActivity.get(reaction.activityId) ?? [];
+      list.push(reaction);
+      reactionsByActivity.set(reaction.activityId, list);
+    }
+
+    return visible.map((activity) => {
+      const activityReactions = reactionsByActivity.get(activity.id) ?? [];
+      return {
+        ...activity,
+        reactions: REACTION_EMOJIS.map((emoji) => {
+          const withEmoji = activityReactions.filter((r) => r.emoji === emoji);
+          return {
+            emoji,
+            count: withEmoji.length,
+            reactedByMe: withEmoji.some((r) => r.userId === viewerId),
+          };
+        }),
+      };
+    });
+  },
+
+  async toggleActivityReaction(
+    userId: string,
+    clubId: string,
+    activityId: string,
+    emoji: string
+  ) {
+    if (!isReactionEmoji(emoji)) {
+      throw new ServiceError("Reação inválida");
+    }
+    const membership = await clubMembershipRepository.findMembership(clubId, userId);
+    if (!membership) {
+      throw new ServiceError("Você não faz parte deste clube");
+    }
+
+    const existing = await activityReactionRepository.findOne(
+      activityId,
+      userId,
+      emoji
+    );
+    if (existing) {
+      await activityReactionRepository.remove(activityId, userId, emoji);
+      return { reacted: false };
+    }
+    await activityReactionRepository.add(activityId, userId, emoji);
+    return { reacted: true };
   },
 
   getClubDetails(clubId: string) {

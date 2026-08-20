@@ -14,9 +14,32 @@ export type CreateActivityData = Pick<
   | "photoUrl"
 >;
 
+export type UpdateActivityData = Partial<
+  Pick<
+    ActivityModel,
+    "title" | "quantity" | "points" | "xpEarned" | "occurredAt" | "categoryId" | "photoUrl"
+  >
+>;
+
 export const activityRepository = {
   create(data: CreateActivityData, tx: Prisma.TransactionClient = prisma) {
     return tx.activity.create({ data });
+  },
+
+  findById(id: string, tx: Prisma.TransactionClient = prisma) {
+    return tx.activity.findUnique({ where: { id } });
+  },
+
+  update(
+    id: string,
+    data: UpdateActivityData,
+    tx: Prisma.TransactionClient = prisma
+  ) {
+    return tx.activity.update({ where: { id }, data });
+  },
+
+  delete(id: string, tx: Prisma.TransactionClient = prisma) {
+    return tx.activity.delete({ where: { id } });
   },
 
   findRecentByUser(userId: string, limit = 8) {
@@ -28,13 +51,11 @@ export const activityRepository = {
     });
   },
 
-  findOccurredDatesByUser(userId: string, tx: Prisma.TransactionClient = prisma) {
-    return tx.activity
-      .findMany({
-        where: { userId },
-        select: { occurredAt: true },
-      })
-      .then((rows) => rows.map((row) => row.occurredAt));
+  listStatsByUser(userId: string, tx: Prisma.TransactionClient = prisma) {
+    return tx.activity.findMany({
+      where: { userId },
+      select: { points: true, xpEarned: true, occurredAt: true },
+    });
   },
 
   findSinceByUser(userId: string, since: Date) {
